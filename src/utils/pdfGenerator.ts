@@ -7,6 +7,8 @@ interface PDFExportParams {
   originalWires: SelectedWireItem[];
   originalTotalArea: number;
   selectedCombination: SuggestedCombination;
+  tolerancePct?: number;
+  maxVariancePct?: number;
 }
 
 export function generateJobCardPDF({
@@ -14,6 +16,8 @@ export function generateJobCardPDF({
   originalWires,
   originalTotalArea,
   selectedCombination,
+  tolerancePct = 1.0,
+  maxVariancePct = 30,
 }: PDFExportParams): jsPDF {
   const doc = new jsPDF({
     orientation: 'portrait',
@@ -51,16 +55,16 @@ export function generateJobCardPDF({
   // Top Left: Company Name
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(15);
-  doc.text('RALFIN ELECTRICALS', 14, 9.5);
+  doc.setFontSize(14);
+  doc.text('RALFIN ELECTRICALS, BANGALORE', 14, 9.5);
 
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(226, 232, 240);
   doc.text('MOTOR WINDING DIVISION  |  PRECISION REWINDING & ENGINEERING', 14, 14.5);
 
-  // Top Right: Date of PDF Generation (explicitly requested at the top right)
-  doc.setFontSize(8.5);
+  // Top Right: Date of PDF Generation
+  doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(255, 255, 255);
   doc.text(`Date of PDF Generation: ${currentDate}`, pageWidth - 14, 9.5, { align: 'right' });
@@ -91,10 +95,13 @@ export function generateJobCardPDF({
 
   currentY += 3;
 
-  // Sanitize any references to Auma (case-insensitive) with Ralin Electricals
+  // Sanitize any references to Auma / Ralin with Ralfin Electricals, Bangalore
   const sanitizePdfText = (str?: string): string => {
     if (!str) return '';
-    return str.replace(/\bauma(\s*india)?\b/gi, 'Ralin Electricals').replace(/\bapex(\s*textiles)?\b/gi, 'Ralin Electricals');
+    return str
+      .replace(/\bauma(\s*india)?\b/gi, 'Ralfin Electricals, Bangalore')
+      .replace(/\bapex(\s*textiles)?\b/gi, 'Ralfin Electricals, Bangalore')
+      .replace(/\bralin(\s*electricals)?\b/gi, 'Ralfin Electricals, Bangalore');
   };
 
   // Power string: do not mention any motor power (kw) if left blank
@@ -105,7 +112,7 @@ export function generateJobCardPDF({
     : '—';
 
   const clientNameDisplay = sanitizePdfText(jobCard.clientName) || '—';
-  const motorDescDisplay = sanitizePdfText(jobCard.motorDesc) || 'Electric Motor Winding';
+  const motorDescDisplay = sanitizePdfText(jobCard.motorDesc) || '—';
   const remarksDisplay = sanitizePdfText(jobCard.remarks) || '—';
 
   const motorTableData = [
@@ -248,6 +255,13 @@ export function generateJobCardPDF({
   doc.setTextColor(...copperColor);
   doc.text('3. SELECTED ALTERNATE COMBINATION', 14, currentY);
 
+  if (selectedCombination.isAdjacentReplacement && selectedCombination.replacementNote) {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...copperColor);
+    doc.text(`Rule: ${selectedCombination.replacementNote}`, pageWidth - 14, currentY, { align: 'right' });
+  }
+
   currentY += 3;
 
   const alternateRows: (string | number)[][] = [];
@@ -337,8 +351,7 @@ export function generateJobCardPDF({
       { content: 'Total Cross-Sectional Area', styles: { fontStyle: 'bold' as const } },
       `${originalTotalArea.toFixed(4)} mm²`,
       `${selectedCombination.totalArea.toFixed(4)} mm²`,
-      // NOTE: "do not mention (standard) after 1.8%"
-      `Diff: ${diffMm} (${diffPctFormatted}) • Within 1.8% of original cross sections combined (PASSED)`,
+      `Diff: ${diffMm} (${diffPctFormatted}) • Within ±${tolerancePct.toFixed(1)}% of original cross sections combined (PASSED)`,
     ],
     [
       { content: 'Area Difference Equivalent', styles: { fontStyle: 'bold' as const } },
@@ -350,8 +363,18 @@ export function generateJobCardPDF({
       { content: 'Strand-to-Strand Variance', styles: { fontStyle: 'bold' as const } },
       'Standard Winding',
       `${selectedCombination.maxVariancePct.toFixed(1)}% max variance`,
-      'Within 30% limit • Balanced Current Flow (APPROVED)',
+      `Within ${maxVariancePct}% limit • Balanced Current Flow (APPROVED)`,
     ],
+    ...(selectedCombination.isAdjacentReplacement
+      ? [
+          [
+            { content: 'Adjacent Replacement Rule', styles: { fontStyle: 'bold' as const } },
+            'Standard Identical',
+            'Adjacent SWG Pair',
+            selectedCombination.replacementNote || 'Two identical wires replaced by two adjacent wires from chart',
+          ],
+        ]
+      : []),
   ];
 
   autoTable(doc, {
@@ -406,56 +429,129 @@ export function generateJobCardPDF({
   });
 
   // @ts-expect-error autoTable adds lastAutoTable to doc
-  currentY = doc.lastAutoTable.finalY + 7;
+  currentY = doc.lastAutoTable.finalY + 4;
 
-  // 6. Sign-off & Quality Inspection Box
-  const signBoxWidth = (pageWidth - 28 - 6) / 2;
+  const contentWidth = pageWidth - 28;
 
-  // Left Sign Box
+  // Adjacent Wire Replacement Banner (if applied)
+  if (selectedCombination.isAdjacentReplacement) {
+    doc.setFillColor(254, 243, 199); // amber-100
+    doc.setDrawColor(252, 211, 77); // amber-300
+    doc.roundedRect(14, currentY, contentWidth, 5.8, 1.2, 1.2, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.0);
+    doc.setTextColor(180, 83, 9); // amber-700
+    doc.text(`[★]  Adjacent Wire Replacement Applied: ${selectedCombination.replacementNote || 'Two identical wires replaced by two adjacent wires from chart.'}`, 17, currentY + 4.1);
+    currentY += 7.5;
+  }
+
+  // 6. Sign-off & Quality Inspection Box (High fidelity matching Output Form preview)
+  const signBoxWidth = (contentWidth - 6) / 2;
+  const signBoxHeight = 22;
+
+  // Check if sign-off box fits on current page before footer (footer starts at pageHeight - 17)
+  if (currentY + signBoxHeight > pageHeight - 17 - 4) {
+    doc.addPage();
+    currentY = 20;
+  }
+
+  // Left Sign Box (Winding Supervisor)
+  doc.setFillColor(248, 250, 252); // slate-50
+  doc.setDrawColor(203, 213, 225); // slate-300
+  doc.setLineWidth(0.2);
+  doc.roundedRect(14, currentY, signBoxWidth, signBoxHeight, 1.8, 1.8, 'FD');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...primaryColor);
+  doc.text('WINDING SUPERVISOR SIGNATURE & NAME:', 17, currentY + 5.2);
+
+  // Signature line & placeholder
   doc.setDrawColor(203, 213, 225);
-  doc.rect(14, currentY, signBoxWidth, 20);
-  doc.setFontSize(7.5);
-  doc.setFont('helvetica', 'bold');
+  doc.line(17, currentY + 13.5, 14 + signBoxWidth - 3, currentY + 13.5);
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(6.2);
+  doc.setTextColor(148, 163, 184); // slate-400
+  doc.text('Signature / Name', 17, currentY + 16.8);
+
+  // Date and Organization
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6.8);
   doc.setTextColor(71, 85, 105);
-  doc.text('REWINDER SIGNATURE & NAME:', 17, currentY + 5);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Date: ________________________', 17, currentY + 16);
+  doc.text('Date: ________________________', 17, currentY + 20.2);
+  doc.setFontSize(6.2);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Ralfin Electricals', 14 + signBoxWidth - 3, currentY + 20.2, { align: 'right' });
 
-  // Right Sign Box
-  doc.rect(14 + signBoxWidth + 6, currentY, signBoxWidth, 20);
-  doc.setFont('helvetica', 'bold');
-  doc.text('QUALITY INSPECTOR / TESTED BY:', 14 + signBoxWidth + 9, currentY + 5);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Status: [✓] Approved for Winding', 14 + signBoxWidth + 9, currentY + 16);
-
-  // 7. Footer Banner & Feedback notice (Bigger font with more visibility as requested)
-  const footerHeight = 17;
-  doc.setFillColor(...primaryColor);
-  doc.rect(0, pageHeight - footerHeight, pageWidth, footerHeight, 'F');
-
-  // Decorative thin amber accent rule
-  doc.setFillColor(...brightAmber);
-  doc.rect(0, pageHeight - footerHeight, pageWidth, 1, 'F');
+  // Right Sign Box (Quality Inspector / Tested By)
+  const rightBoxX = 14 + signBoxWidth + 6;
+  doc.setFillColor(248, 250, 252); // slate-50
+  doc.setDrawColor(203, 213, 225); // slate-300
+  doc.setLineWidth(0.2);
+  doc.roundedRect(rightBoxX, currentY, signBoxWidth, signBoxHeight, 1.8, 1.8, 'FD');
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9.5); // Bigger font with high visibility
-  doc.setTextColor(255, 255, 255); // Crisp white
-  doc.text(
-    'Please send your feedback regarding improvements and additional features you need, to developer Lukhman at +91-7019192462 (Message only)',
-    pageWidth / 2,
-    pageHeight - 9.5,
-    { align: 'center' }
-  );
-
-  doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
-  doc.setTextColor(...warmHighlight);
-  doc.text(
-    'Ralfin Electricals • Motor Winding Division • Alternate Wire Gauge Calculation & Job Card',
-    pageWidth / 2,
-    pageHeight - 4,
-    { align: 'center' }
-  );
+  doc.setTextColor(...primaryColor);
+  doc.text('QUALITY INSPECTOR / TESTED BY:', rightBoxX + 3, currentY + 5.2);
+
+  // Signature line & placeholder for Quality Inspector
+  doc.setDrawColor(203, 213, 225);
+  doc.line(rightBoxX + 3, currentY + 13.5, rightBoxX + signBoxWidth - 3, currentY + 13.5);
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(6.2);
+  doc.setTextColor(148, 163, 184); // slate-400
+  doc.text('Signature / Name', rightBoxX + 3, currentY + 16.8);
+
+  // Date and Division
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6.8);
+  doc.setTextColor(71, 85, 105);
+  doc.text('Date: ________________________', rightBoxX + 3, currentY + 20.2);
+  doc.setFontSize(6.2);
+  doc.setTextColor(100, 116, 139);
+  doc.text('QA Division', rightBoxX + signBoxWidth - 3, currentY + 20.2, { align: 'right' });
+
+  // 7. Footer Banner & Feedback notice (Rendered across all pages)
+  const footerHeight = 19;
+  const totalPages = (doc.internal as unknown as { getNumberOfPages: () => number }).getNumberOfPages();
+
+  for (let p = 1; p <= totalPages; p++) {
+    doc.setPage(p);
+
+    doc.setFillColor(...primaryColor);
+    doc.rect(0, pageHeight - footerHeight, pageWidth, footerHeight, 'F');
+
+    // Decorative thin amber accent rule
+    doc.setFillColor(...brightAmber);
+    doc.rect(0, pageHeight - footerHeight, pageWidth, 1, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.6); // Prominent visible font
+    doc.setTextColor(255, 255, 255); // Crisp white
+    doc.text(
+      'Please send your feedback regarding improvements and additional features you need,',
+      pageWidth / 2,
+      pageHeight - 13,
+      { align: 'center' }
+    );
+    doc.text(
+      'to developer Lukhman at +91-7019192462 (Message on whatsapp only)',
+      pageWidth / 2,
+      pageHeight - 8.5,
+      { align: 'center' }
+    );
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.0);
+    doc.setTextColor(...warmHighlight);
+    doc.text(
+      `Ralfin Electricals, Bangalore • Motor Winding Division • Alternate Wire Gauge Calculation & Job Card${totalPages > 1 ? `  [ Page ${p} of ${totalPages} ]` : ''}`,
+      pageWidth / 2,
+      pageHeight - 3.8,
+      { align: 'center' }
+    );
+  }
 
   return doc;
 }

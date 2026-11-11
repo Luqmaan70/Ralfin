@@ -23,7 +23,7 @@ export const FeedbackFooter: React.FC = () => {
     if (!feedbackText.trim()) return;
 
     const message = encodeURIComponent(
-      `Hello Lukhman, I am using the Alternate Wire Gauge Calculator for Ralfin Electricals.\n\nFeedback / Feature Suggestion:\n${feedbackText}`
+      `Hello Lukhman, I am using the Alternate Wire Gauge Calculator for Ralfin Electricals, Bangalore.\n\nFeedback / Feature Suggestion:\n${feedbackText}`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank');
     setIsSent(true);
@@ -44,24 +44,23 @@ export const FeedbackFooter: React.FC = () => {
               <MessageSquare className="w-5 h-5 text-amber-100" />
             </div>
             <div>
-              <p className="text-sm sm:text-base font-extrabold text-white">
-                Have suggestions or need additional motor winding features?
+              <p className="text-sm sm:text-base font-extrabold text-amber-300">
+                Please send your feedback regarding improvements and additional features you need,
               </p>
-              <p className="text-xs sm:text-sm text-amber-50 font-medium leading-relaxed mt-1">
-                Please send your feedback regarding improvements and additional features you need, to developer{' '}
-                <strong className="text-white underline font-bold">{developerName}</strong> at{' '}
+              <p className="text-xs sm:text-sm text-white font-medium leading-relaxed mt-0.5">
+                to developer <strong className="text-amber-300 font-bold">{developerName}</strong> at{' '}
                 <a
                   href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-                    'Hello Lukhman, I have a suggestion/feedback for the Alternate Wire Gauge Calculator for Ralfin Electricals:'
+                    'Hello Lukhman, I have a suggestion/feedback for the Alternate Wire Gauge Calculator for Ralfin Electricals, Bangalore:'
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-extrabold text-white hover:text-amber-200 transition underline underline-offset-2"
+                  className="font-extrabold text-amber-300 hover:text-white transition underline underline-offset-2"
                 >
                   {developerPhone}
                 </a>{' '}
-                <span className="inline-block px-2.5 py-1 ml-1 text-xs font-bold bg-slate-950/90 text-amber-300 border border-amber-300/50 rounded-lg shadow-xs">
-                  (Kindly do not call, please send a message instead)
+                <span className="font-bold text-amber-200">
+                  (Message on whatsapp only)
                 </span>
               </p>
             </div>
@@ -70,7 +69,7 @@ export const FeedbackFooter: React.FC = () => {
           <div className="flex items-center gap-2 shrink-0">
             <a
               href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-                'Hello Lukhman, I have a suggestion/feedback for the Alternate Wire Gauge Calculator for Ralfin Electricals:'
+                'Hello Lukhman, I have a suggestion/feedback for the Alternate Wire Gauge Calculator for Ralfin Electricals, Bangalore:'
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -151,10 +150,10 @@ export const FeedbackFooter: React.FC = () => {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <div>
             <p className="font-semibold text-slate-200">
-              Ralfin Electricals — Motor Winding Division
+              Ralfin Electricals, Bangalore — Motor Winding Division
             </p>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Specialists in industrial AC/DC motor rewinding, coil design, and magnetic wire engineering.
+              Specialists in manufacture of 3 phase industrial AC motor, windings, rewinding, component manufacture, wire harness manufacture, etc.
             </p>
           </div>
 

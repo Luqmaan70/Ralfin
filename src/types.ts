@@ -35,6 +35,8 @@ export interface SuggestedCombination {
     area: number;
     diffFromDifference: number;
   } | null;
+  isAdjacentReplacement?: boolean;
+  replacementNote?: string;
 }
 
 export interface MotorJobCard {

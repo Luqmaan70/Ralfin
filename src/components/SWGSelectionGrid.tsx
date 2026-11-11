@@ -108,9 +108,9 @@ export const SWGSelectionGrid: React.FC<SWGSelectionGridProps> = ({
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
             placeholder="Search by gauge (e.g. 18) or dia (e.g. 1.219)..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 uppercase"
           />
           {searchQuery && (
             <button

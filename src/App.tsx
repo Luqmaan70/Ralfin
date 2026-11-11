@@ -51,13 +51,18 @@ export default function App() {
   const [selectedCombination, setSelectedCombination] =
     useState<SuggestedCombination | null>(null);
 
-  // Calculation tolerance (default 1.8% as required)
-  const [tolerancePct, setTolerancePct] = useState<number>(1.8);
+  // Calculation tolerance (allowable 0.5% - 3.0%, initially set to 1.0%)
+  const [tolerancePct, setTolerancePct] = useState<number>(1.0);
+  // Strand-to-strand variance tolerance (allowable 0% - 50%, initially set to 30%)
+  const [maxVariancePct, setMaxVariancePct] = useState<number>(30);
 
-  // Helper to replace any references to Auma (case-insensitive) with Ralin Electricals
+  // Helper to replace any references to Auma / Ralin with Ralfin Electricals, Bangalore
   const sanitizeAuma = (text?: string): string => {
     if (!text) return '';
-    return text.replace(/\bauma(\s*india)?\b/gi, 'Ralin Electricals').replace(/\bapex(\s*textiles)?\b/gi, 'Ralin Electricals');
+    return text
+      .replace(/\bauma(\s*india)?\b/gi, 'Ralfin Electricals, Bangalore')
+      .replace(/\bapex(\s*textiles)?\b/gi, 'Ralfin Electricals, Bangalore')
+      .replace(/\bralin(\s*electricals)?\b/gi, 'Ralfin Electricals, Bangalore');
   };
 
   // History list
@@ -73,7 +78,7 @@ export default function App() {
               ...item,
               jobCard: {
                 ...item.jobCard,
-                clientName: sanitizeAuma(item.jobCard.clientName) || 'Ralin Electricals',
+                clientName: sanitizeAuma(item.jobCard.clientName) || 'Ralfin Electricals, Bangalore',
                 motorDesc: sanitizeAuma(item.jobCard.motorDesc),
                 remarks: sanitizeAuma(item.jobCard.remarks),
               },
@@ -87,37 +92,40 @@ export default function App() {
     return [];
   });
 
-  // Motor Job Card State (clientName suggested as 'Ralin Electricals', motor power default 0.75 KW / 1.0 HP)
+  // Motor Job Card State (clientName suggested as 'Ralfin Electricals, Bangalore', motor power KW and HP left blank)
   const [jobCard, setJobCard] = useState<MotorJobCard>(() => {
+    const toUpper = (str?: string) => (str ? str.toUpperCase() : '');
     try {
       const saved = localStorage.getItem(STORAGE_KEY_JOB_CARD);
       if (saved) {
         const parsed = JSON.parse(saved);
         let client = sanitizeAuma(parsed.clientName);
-        if (!client || /auma|apex/i.test(client)) {
-          client = 'Ralin Electricals';
+        if (!client || /auma|apex|ralin/i.test(client)) {
+          client = 'Ralfin Electricals, Bangalore';
         }
         return {
           ...parsed,
-          clientName: client || 'Ralin Electricals',
-          motorDesc: sanitizeAuma(parsed.motorDesc) || '3-Phase AC Induction Motor',
-          powerKw: parsed.powerKw === '0.75' ? '' : (parsed.powerKw || ''),
-          hp: parsed.hp === '1.0' ? '' : (parsed.hp || ''),
-          voltage: parsed.voltage === '415' ? '' : (parsed.voltage || ''),
-          mounting: parsed.mounting === 'Foot Mounted (B3)' ? '' : (parsed.mounting || ''),
-          bearings: '',
-          remarks: sanitizeAuma(parsed.remarks) || '',
+          clientName: toUpper(client || 'Ralfin Electricals, Bangalore'),
+          motorDesc: parsed.motorDesc === '3-PHASE AC INDUCTION MOTOR' ? '' : toUpper(sanitizeAuma(parsed.motorDesc) || ''),
+          serialNo: toUpper(parsed.serialNo || ''),
+          motorType: toUpper(parsed.motorType || '3-PHASE SQUIRREL CAGE INDUCTION'),
+          powerKw: parsed.powerKw === '0.75' ? '' : toUpper(parsed.powerKw || ''),
+          hp: parsed.hp === '1.0' ? '' : toUpper(parsed.hp || ''),
+          voltage: parsed.voltage === '415' ? '' : toUpper(parsed.voltage || ''),
+          mounting: parsed.mounting === 'Foot Mounted (B3)' ? '' : toUpper(parsed.mounting || ''),
+          bearings: toUpper(parsed.bearings || ''),
+          remarks: toUpper(sanitizeAuma(parsed.remarks) || ''),
         };
       }
     } catch (e) {
       // fallback
     }
     return {
-      clientName: 'Ralin Electricals',
+      clientName: 'RALFIN ELECTRICALS, BANGALORE',
       contactPhone: '',
-      motorDesc: '3-Phase AC Induction Motor',
+      motorDesc: '',
       serialNo: '',
-      motorType: '3-Phase Squirrel Cage Induction',
+      motorType: '3-PHASE SQUIRREL CAGE INDUCTION',
       powerKw: '',
       hp: '',
       voltage: '',
@@ -188,18 +196,19 @@ export default function App() {
     return selectedWires.reduce((sum, item) => sum + item.count, 0);
   }, [selectedWires]);
 
-  // Generate Suggestions
+  // Generate Suggestions (excluding exact same combination as original)
   const suggestions = useMemo(() => {
     if (!originalTotalArea || originalTotalArea <= 0) return [];
     return generateAlternateCombinations({
       originalArea: originalTotalArea,
       swgTable,
       tolerancePct,
-      maxVariancePct: 30.0, // strictly within 30% variance
+      maxVariancePct,
       minWires: 1,
       maxWires: 8,
+      originalWires: selectedWires,
     });
-  }, [originalTotalArea, swgTable, tolerancePct]);
+  }, [originalTotalArea, swgTable, tolerancePct, maxVariancePct, selectedWires]);
 
   // Reset selected combination if original wires change significantly
   useEffect(() => {
@@ -453,6 +462,8 @@ export default function App() {
             onSavedToHistory={() => {
               // already added, or can update
             }}
+            tolerancePct={tolerancePct}
+            maxVariancePct={maxVariancePct}
           />
         ) : (
           /* Main Calculation Mode: Selection Panel + Breakdown + Suggestions */
@@ -485,6 +496,8 @@ export default function App() {
                 onSelectCombination={handleSelectCombination}
                 tolerancePct={tolerancePct}
                 onChangeTolerance={setTolerancePct}
+                maxVariancePct={maxVariancePct}
+                onChangeMaxVariance={setMaxVariancePct}
               />
             )}
           </div>

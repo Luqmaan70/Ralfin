@@ -53,7 +53,8 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
     });
 
     const clientClean = (item.jobCard.clientName || 'Motor')
-      .replace(/\bauma(\s*india)?\b/gi, 'Ralin')
+      .replace(/\bauma(\s*india)?\b/gi, 'Ralfin')
+      .replace(/\bralin(\s*electricals)?\b/gi, 'Ralfin')
       .replace(/[^a-zA-Z0-9]/g, '_')
       .substring(0, 15);
     doc.save(`Ralfin_Winding_${clientClean}_${item.id}.pdf`);
@@ -113,7 +114,9 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                       <>
                         <span className="text-slate-300">•</span>
                         <span className="font-bold text-amber-700">
-                          {item.jobCard.clientName.replace(/\bauma(\s*india)?\b/gi, 'Ralin Electricals')}
+                          {item.jobCard.clientName
+                            .replace(/\bauma(\s*india)?\b/gi, 'Ralfin Electricals, Bangalore')
+                            .replace(/\bralin(\s*electricals)?\b/gi, 'Ralfin Electricals, Bangalore')}
                         </span>
                       </>
                     )}

@@ -156,9 +156,9 @@ export const SWGTableModal: React.FC<SWGTableModalProps> = ({
             <input
               type="text"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value.toUpperCase())}
               placeholder="Search SWG or diameter..."
-              className="w-full pl-7 pr-2.5 py-1.5 bg-white rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full pl-7 pr-2.5 py-1.5 bg-white rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-amber-500 uppercase"
             />
           </div>
 

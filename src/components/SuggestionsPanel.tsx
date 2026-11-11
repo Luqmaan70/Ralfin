@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Info,
   SlidersHorizontal,
+  Sparkles,
 } from 'lucide-react';
 
 interface SuggestionsPanelProps {
@@ -18,6 +19,8 @@ interface SuggestionsPanelProps {
   onSelectCombination: (comb: SuggestedCombination) => void;
   tolerancePct: number;
   onChangeTolerance: (tol: number) => void;
+  maxVariancePct: number;
+  onChangeMaxVariance: (variance: number) => void;
 }
 
 export const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
@@ -27,6 +30,8 @@ export const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
   onSelectCombination,
   tolerancePct,
   onChangeTolerance,
+  maxVariancePct,
+  onChangeMaxVariance,
 }) => {
   // Slider state for wire count: 0 means 'All' (1-8), 1..8 means exact wire count
   const [wireCountFilter, setWireCountFilter] = useState<number>(0);
@@ -71,7 +76,7 @@ export const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
               Suggested Alternate Wire Combinations
             </h3>
             <p className="text-[11px] text-amber-200">
-              Cross-sectional area within ±{tolerancePct}% • Strand variance ≤ 30% • Sorted 1 to 8 wires
+              Cross-sectional area within ±{tolerancePct.toFixed(1)}% • Strand variance ≤ {maxVariancePct}% • Sorted 1 to 8 wires
             </p>
           </div>
         </div>
@@ -83,7 +88,179 @@ export const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
         </div>
       </div>
 
-      {/* Slider Controls Bar directly above suggestions */}
+      {/* DUAL PROMINENT NEON SLIDERS: Area Tolerance (Neon Yellow) + Strand Variance (Neon Green) */}
+      <div className="p-3 sm:p-4 bg-slate-900 border-b border-slate-800 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="w-4 h-4 text-amber-400" />
+            <span className="text-xs sm:text-sm font-black tracking-wide text-white uppercase">
+              Calculation Limit Sliders
+            </span>
+          </div>
+          <span className="text-[11px] text-slate-400">
+            Instant real-time filtering of parallel wire solutions
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          {/* SLIDER 1: AREA TOLERANCE - PROMINENT NEON YELLOW (0.5% to 3.0%, initial 1.0%) */}
+          <div className="bg-slate-950 rounded-xl p-3 sm:p-3.5 border-2 border-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.3)] space-y-2.5 transition-all">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-yellow-400 shadow-[0_0_10px_#facc15] animate-pulse" />
+                <div>
+                  <h4 className="text-xs sm:text-sm font-black tracking-wider text-yellow-300 uppercase drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]">
+                    Area Tolerance Limit
+                  </h4>
+                  <span className="text-[10px] text-yellow-200/70 font-medium">
+                    Allowable limit: 0.5% to 3.0%
+                  </span>
+                </div>
+              </div>
+
+              {/* Prominent Neon Yellow Value Badge */}
+              <div className="px-3 py-1 rounded-lg bg-yellow-400 text-slate-950 font-black font-mono text-sm sm:text-base shadow-[0_0_14px_#facc15] tracking-tight shrink-0 border border-yellow-200">
+                ±{tolerancePct.toFixed(1)}%
+              </div>
+            </div>
+
+            {/* Neon Yellow Range Input */}
+            <div className="space-y-1.5 pt-1">
+              <input
+                type="range"
+                min="0.5"
+                max="3.0"
+                step="0.1"
+                value={tolerancePct}
+                onChange={(e) => onChangeTolerance(parseFloat(e.target.value))}
+                className="w-full h-3 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-yellow-400 focus:outline-none ring-2 ring-yellow-400/40"
+              />
+
+              {/* Quick shortcut tick markers */}
+              <div className="flex justify-between text-[10px] font-bold text-yellow-300/80 px-0.5">
+                <button
+                  type="button"
+                  onClick={() => onChangeTolerance(0.5)}
+                  className={`hover:text-yellow-100 transition ${tolerancePct === 0.5 ? 'text-white underline font-black' : ''}`}
+                >
+                  0.5%
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChangeTolerance(1.0)}
+                  className={`hover:text-yellow-100 transition px-1.5 py-0.2 rounded bg-yellow-400/25 text-yellow-300 ${tolerancePct === 1.0 ? 'ring-1 ring-yellow-400 text-white font-black' : ''}`}
+                >
+                  1.0% (Initial)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChangeTolerance(1.5)}
+                  className={`hover:text-yellow-100 transition ${tolerancePct === 1.5 ? 'text-white underline font-black' : ''}`}
+                >
+                  1.5%
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChangeTolerance(1.8)}
+                  className={`hover:text-yellow-100 transition ${tolerancePct === 1.8 ? 'text-white underline font-black' : ''}`}
+                >
+                  1.8%
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChangeTolerance(2.0)}
+                  className={`hover:text-yellow-100 transition ${tolerancePct === 2.0 ? 'text-white underline font-black' : ''}`}
+                >
+                  2.0%
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChangeTolerance(3.0)}
+                  className={`hover:text-yellow-100 transition ${tolerancePct === 3.0 ? 'text-white underline font-black' : ''}`}
+                >
+                  3.0% (Max)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* SLIDER 2: STRAND VARIANCE - PROMINENT NEON GREEN (0% to 50%, initial 30%) */}
+          <div className="bg-slate-950 rounded-xl p-3 sm:p-3.5 border-2 border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.3)] space-y-2.5 transition-all">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399] animate-pulse" />
+                <div>
+                  <h4 className="text-xs sm:text-sm font-black tracking-wider text-emerald-300 uppercase drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
+                    Strand Variance Limit
+                  </h4>
+                  <span className="text-[10px] text-emerald-200/70 font-medium">
+                    Allowable variation: 0% to 50%
+                  </span>
+                </div>
+              </div>
+
+              {/* Prominent Neon Green Value Badge */}
+              <div className="px-3 py-1 rounded-lg bg-emerald-400 text-slate-950 font-black font-mono text-sm sm:text-base shadow-[0_0_14px_#34d399] tracking-tight shrink-0 border border-emerald-200">
+                ≤ {maxVariancePct}%
+              </div>
+            </div>
+
+            {/* Neon Green Range Input */}
+            <div className="space-y-1.5 pt-1">
+              <input
+                type="range"
+                min="0"
+                max="50"
+                step="1"
+                value={maxVariancePct}
+                onChange={(e) => onChangeMaxVariance(parseInt(e.target.value, 10))}
+                className="w-full h-3 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-400 focus:outline-none ring-2 ring-emerald-400/40"
+              />
+
+              {/* Quick shortcut tick markers */}
+              <div className="flex justify-between text-[10px] font-bold text-emerald-300/80 px-0.5">
+                <button
+                  type="button"
+                  onClick={() => onChangeMaxVariance(0)}
+                  className={`hover:text-emerald-100 transition ${maxVariancePct === 0 ? 'text-white underline font-black' : ''}`}
+                >
+                  0% (Identical)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChangeMaxVariance(15)}
+                  className={`hover:text-emerald-100 transition ${maxVariancePct === 15 ? 'text-white underline font-black' : ''}`}
+                >
+                  15%
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChangeMaxVariance(30)}
+                  className={`hover:text-emerald-100 transition px-1.5 py-0.2 rounded bg-emerald-400/25 text-emerald-300 ${maxVariancePct === 30 ? 'ring-1 ring-emerald-400 text-white font-black' : ''}`}
+                >
+                  30% (Initial)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChangeMaxVariance(40)}
+                  className={`hover:text-emerald-100 transition ${maxVariancePct === 40 ? 'text-white underline font-black' : ''}`}
+                >
+                  40%
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChangeMaxVariance(50)}
+                  className={`hover:text-emerald-100 transition ${maxVariancePct === 50 ? 'text-white underline font-black' : ''}`}
+                >
+                  50% (Max)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Wire Count Slider & Filter Bar directly above suggestions */}
       <div className="p-3 sm:p-4 bg-slate-50 border-b border-slate-200 space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           <div className="flex items-center gap-2">
@@ -94,24 +271,6 @@ export const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
             <span className="text-xs font-extrabold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
               {wireCountFilter === 0 ? 'All Wires (1 to 8)' : `${wireCountFilter} Wire${wireCountFilter > 1 ? 's' : ''}`}
             </span>
-          </div>
-
-          {/* Quick tolerance switch */}
-          <div className="flex items-center gap-1.5 text-xs text-slate-600 self-start sm:self-auto">
-            <span className="font-medium text-slate-500">Tolerance:</span>
-            {[1.5, 1.8, 2.0].map((tol) => (
-              <button
-                key={tol}
-                onClick={() => onChangeTolerance(tol)}
-                className={`px-2 py-0.5 rounded text-xs font-semibold transition ${
-                  tolerancePct === tol
-                    ? 'bg-amber-600 text-white shadow-xs'
-                    : 'bg-white text-slate-700 border border-slate-300 hover:border-amber-400'
-                }`}
-              >
-                ±{tol}%
-              </button>
-            ))}
           </div>
         </div>
 
@@ -241,9 +400,17 @@ export const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
                         #{index + 1}
                       </span>
                       <div>
-                        <h4 className="font-extrabold text-sm text-slate-900 leading-tight">
-                          {summaryTitle}
-                        </h4>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <h4 className="font-extrabold text-sm text-slate-900 leading-tight">
+                            {summaryTitle}
+                          </h4>
+                          {comb.isAdjacentReplacement && (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
+                              <Sparkles className="w-2.5 h-2.5 text-amber-600" />
+                              Adjacent Wires
+                            </span>
+                          )}
+                        </div>
                         <span className="text-[11px] text-slate-500 font-medium">
                           {comb.wireCount} Wire Strand{comb.wireCount > 1 ? 's' : ''} in Parallel
                         </span>
@@ -272,12 +439,30 @@ export const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
                     </div>
                   </div>
 
+                  {/* Adjacent Wire Replacement Rule Callout */}
+                  {comb.isAdjacentReplacement && (
+                    <div className="mx-3 mt-2.5 p-2 bg-gradient-to-r from-amber-500/10 via-amber-100/60 to-orange-50 rounded-lg border border-amber-300/90 flex items-start gap-2 text-xs">
+                      <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 font-bold text-amber-950">
+                          <span>Adjacent Wire Replacement Rule Applied</span>
+                          <span className="px-1.5 py-0.2 rounded text-[10px] font-extrabold uppercase bg-amber-200 text-amber-900 border border-amber-400/50">
+                            Equiv Pair
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-amber-900 font-medium mt-0.5 leading-snug">
+                          {comb.replacementNote || 'Two identical wires replaced by combination of two adjacent wires from chart.'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Individual Wire Breakdown: ONE SINGLE WIRE PER ROW */}
                   <div className="p-3 space-y-2.5 flex-1">
                     <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center justify-between">
                       <span>Wire Totalling (One Wire Per Row)</span>
                       <span className="text-[10px] text-slate-400">
-                        Strand Variance: {comb.maxVariancePct.toFixed(1)}% (≤30%)
+                        Strand Variance: {comb.maxVariancePct.toFixed(1)}% (≤{maxVariancePct}%)
                       </span>
                     </div>
 

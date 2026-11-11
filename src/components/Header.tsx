@@ -13,13 +13,14 @@ interface HeaderProps {
   historyCount: number;
 }
 
+
 export const Header: React.FC<HeaderProps> = ({
   onOpenHistory,
   onOpenSWGTable,
   historyCount,
 }) => {
   return (
-    <header className="bg-slate-900 border-b border-amber-600/40 text-white shadow-xl relative overflow-hidden">
+    <header className="bg-slate-900 border-b border-amber-600/40 text-white shadow-xl relative overflow-hidden print:hidden">
       {/* Decorative copper gradient top line */}
       <div className="h-1.5 w-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500" />
 
@@ -29,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex flex-wrap items-baseline gap-2.5">
             {/* Prominent Company Name */}
             <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase drop-shadow-xs">
-              Ralfin Electricals
+              Ralfin Electricals, Bangalore
             </h1>
             <span className="text-xs sm:text-sm font-bold tracking-wider uppercase px-2.5 py-0.5 bg-amber-500/20 text-amber-300 rounded-md border border-amber-400/40">
               Motor Winding Division
@@ -54,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({
               </a>
               <span className="text-slate-600">•</span>
               <a
-                href="https://wa.me/917019192462?text=Hello%20Lukhman,%20regarding%20Alternate%20Wire%20Gauge%20Calculator:"
+                href="https://wa.me/917019192462?text=Hello%20Lukhman,%20regarding%20Alternate%20Wire%20Gauge%20Calculator%20(Ralfin%20Electricals,%20Bangalore):"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-emerald-400 hover:text-emerald-300 transition-colors font-semibold flex items-center gap-1"

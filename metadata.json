@@ -1,6 +1,6 @@
 {
   "name": "Alternate Wire Gauge Calculator",
-  "description": "Professional Alternate Wire Gauge Calculator for Motor Winding by Ralfin Electricals. Calculate equivalent SWG combinations within 1.8% tolerance, generate motor winding job cards, and export PDF reports.",
+  "description": "Professional Alternate Wire Gauge Calculator for Motor Winding by Ralfin Electricals, Bangalore. Calculate equivalent SWG combinations within 1.8% tolerance, generate motor winding job cards, and export PDF reports.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

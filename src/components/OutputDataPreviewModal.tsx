@@ -42,7 +42,7 @@ export const OutputDataPreviewModal: React.FC<OutputDataPreviewModalProps> = ({
   onPrint,
   onEditForm,
   isExporting = false,
-  tolerancePct = 1.0,
+  tolerancePct = 1.5,
   maxVariancePct = 30,
 }) => {
   if (!isOpen) return null;

@@ -8,8 +8,10 @@ import {
   Sparkles,
   HelpCircle,
 } from 'lucide-react';
+import { useLanguage } from '../i18n';
 
 export const FeedbackFooter: React.FC = () => {
+  const { t } = useLanguage();
   const [feedbackText, setFeedbackText] = useState('');
   const [isSent, setIsSent] = useState(false);
   const [showQuickForm, setShowQuickForm] = useState(false);
@@ -44,24 +46,11 @@ export const FeedbackFooter: React.FC = () => {
               <MessageSquare className="w-5 h-5 text-amber-100" />
             </div>
             <div>
-              <p className="text-sm sm:text-base font-extrabold text-amber-300">
-                Please send your feedback regarding improvements and additional features you need,
+              <p className="text-sm sm:text-base font-extrabold text-amber-300 leading-snug">
+                {t('feedbackNoticeLine1')}
               </p>
               <p className="text-xs sm:text-sm text-white font-medium leading-relaxed mt-0.5">
-                to developer <strong className="text-amber-300 font-bold">{developerName}</strong> at{' '}
-                <a
-                  href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-                    'Hello Lukhman, I have a suggestion/feedback for the Alternate Wire Gauge Calculator for Ralfin Electricals, Bangalore:'
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-extrabold text-amber-300 hover:text-white transition underline underline-offset-2"
-                >
-                  {developerPhone}
-                </a>{' '}
-                <span className="font-bold text-amber-200">
-                  (Message on whatsapp only)
-                </span>
+                {t('feedbackNoticeLine2')}
               </p>
             </div>
           </div>

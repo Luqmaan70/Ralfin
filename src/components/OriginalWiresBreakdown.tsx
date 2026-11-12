@@ -1,6 +1,7 @@
 import React from 'react';
 import { SelectedWireItem } from '../types';
 import { Calculator, AlertCircle, Trash2 } from 'lucide-react';
+import { useLanguage } from '../i18n';
 
 interface OriginalWiresBreakdownProps {
   selectedWires: SelectedWireItem[];
@@ -15,6 +16,7 @@ export const OriginalWiresBreakdown: React.FC<OriginalWiresBreakdownProps> = ({
   onRemoveIndividualWire,
   onClearAll,
 }) => {
+  const { t } = useLanguage();
   // Flatten into individual single wire rows (one wire per row)
   const flattenedWires: {
     wireIndex: number;
@@ -64,10 +66,10 @@ export const OriginalWiresBreakdown: React.FC<OriginalWiresBreakdownProps> = ({
           <Calculator className="w-5 h-5 text-amber-400" />
           <div>
             <h3 className="text-sm sm:text-base font-bold text-white">
-              Original Wire Set Breakdown (One Wire Per Row)
+              {t('originalBreakdown')}
             </h3>
             <p className="text-[11px] text-slate-300">
-              {flattenedWires.length} individual wire strand{flattenedWires.length > 1 ? 's' : ''} in parallel
+              {flattenedWires.length} {t('strands')}
             </p>
           </div>
         </div>
@@ -75,7 +77,7 @@ export const OriginalWiresBreakdown: React.FC<OriginalWiresBreakdownProps> = ({
         {/* Big Total Area Callout */}
         <div className="flex items-baseline gap-2 bg-slate-800 px-3.5 py-1.5 rounded-lg border border-slate-700">
           <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
-            Total Original Area:
+            {t('originalTotal')}:
           </span>
           <span className="text-lg sm:text-xl font-extrabold text-amber-400 font-mono">
             {totalArea.toFixed(4)}
@@ -89,16 +91,16 @@ export const OriginalWiresBreakdown: React.FC<OriginalWiresBreakdownProps> = ({
         <table className="w-full text-left text-xs sm:text-sm">
           <thead>
             <tr className="bg-slate-100 text-slate-700 border-b border-slate-200 text-[11px] uppercase tracking-wider font-semibold">
-              <th className="py-2.5 px-3 sm:px-4 text-center w-14">#</th>
-              <th className="py-2.5 px-3 sm:px-4">SWG Gauge</th>
-              <th className="py-2.5 px-3 sm:px-4 text-right">Bare Dia (mm)</th>
+              <th className="py-2.5 px-3 sm:px-4 text-center w-14">{t('row')}</th>
+              <th className="py-2.5 px-3 sm:px-4">{t('wireGauge')}</th>
+              <th className="py-2.5 px-3 sm:px-4 text-right">{t('bareDia')} (mm)</th>
               <th className="py-2.5 px-3 sm:px-4 text-right hidden sm:table-cell">
-                Bare Dia (in)
+                {t('bareDia')} (in)
               </th>
               <th className="py-2.5 px-3 sm:px-4 text-right font-semibold">
-                Area (mm²)
+                {t('area')} (mm²)
               </th>
-              <th className="py-2.5 px-3 sm:px-4 text-center w-12">Action</th>
+              <th className="py-2.5 px-3 sm:px-4 text-center w-12">{t('action')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-150">
@@ -146,7 +148,7 @@ export const OriginalWiresBreakdown: React.FC<OriginalWiresBreakdownProps> = ({
                 TOTAL
               </td>
               <td className="py-3 px-3 sm:px-4 text-amber-900">
-                {flattenedWires.length} Wire Strand{flattenedWires.length > 1 ? 's' : ''}
+                {flattenedWires.length} {t('strands')}
               </td>
               <td className="py-3 px-3 sm:px-4 text-right text-slate-400">
                 —
@@ -162,7 +164,7 @@ export const OriginalWiresBreakdown: React.FC<OriginalWiresBreakdownProps> = ({
                   onClick={onClearAll}
                   className="text-[10px] text-rose-600 hover:underline font-semibold"
                 >
-                  Clear
+                  {t('clearAll')}
                 </button>
               </td>
             </tr>

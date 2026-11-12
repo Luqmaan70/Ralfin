@@ -4,7 +4,6 @@ import {
   SelectedWireItem,
   SuggestedCombination,
   MotorJobCard,
-  CalculationHistoryItem,
 } from './types';
 import { DEFAULT_SWG_TABLE } from './data/swgData';
 import { generateAlternateCombinations } from './utils/combinationEngine';
@@ -13,9 +12,9 @@ import { SWGSelectionGrid } from './components/SWGSelectionGrid';
 import { OriginalWiresBreakdown } from './components/OriginalWiresBreakdown';
 import { SuggestionsPanel } from './components/SuggestionsPanel';
 import { JobCardAndExportPanel } from './components/JobCardAndExportPanel';
-import { HistoryModal } from './components/HistoryModal';
 import { SWGTableModal } from './components/SWGTableModal';
 import { FeedbackFooter } from './components/FeedbackFooter';
+import { useLanguage } from './i18n';
 import {
   Layers,
   Sparkles,
@@ -28,11 +27,11 @@ import {
   Tablet,
 } from 'lucide-react';
 
-const STORAGE_KEY_HISTORY = 'ralfin_swg_history_v1';
 const STORAGE_KEY_CUSTOM_TABLE = 'ralfin_swg_custom_table_v1';
 const STORAGE_KEY_JOB_CARD = 'ralfin_swg_job_card_draft';
 
 export default function App() {
+  const { t } = useLanguage();
   // SWG Table state (defaults to standard BS 3728 / IS 13730)
   const [swgTable, setSwgTable] = useState<SWGWire[]>(() => {
     try {
@@ -51,8 +50,8 @@ export default function App() {
   const [selectedCombination, setSelectedCombination] =
     useState<SuggestedCombination | null>(null);
 
-  // Calculation tolerance (allowable 0.5% - 3.0%, initially set to 1.0%)
-  const [tolerancePct, setTolerancePct] = useState<number>(1.0);
+  // Calculation tolerance (allowable 0.5% - 3.0%, initially set to 1.5%)
+  const [tolerancePct, setTolerancePct] = useState<number>(1.5);
   // Strand-to-strand variance tolerance (allowable 0% - 50%, initially set to 30%)
   const [maxVariancePct, setMaxVariancePct] = useState<number>(30);
 
@@ -64,33 +63,6 @@ export default function App() {
       .replace(/\bapex(\s*textiles)?\b/gi, 'Ralfin Electricals, Bangalore')
       .replace(/\bralin(\s*electricals)?\b/gi, 'Ralfin Electricals, Bangalore');
   };
-
-  // History list
-  const [history, setHistory] = useState<CalculationHistoryItem[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY_HISTORY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return parsed.map((item: CalculationHistoryItem) => {
-            if (!item || !item.jobCard) return item;
-            return {
-              ...item,
-              jobCard: {
-                ...item.jobCard,
-                clientName: sanitizeAuma(item.jobCard.clientName) || 'Ralfin Electricals, Bangalore',
-                motorDesc: sanitizeAuma(item.jobCard.motorDesc),
-                remarks: sanitizeAuma(item.jobCard.remarks),
-              },
-            };
-          });
-        }
-      }
-    } catch (e) {
-      // fallback
-    }
-    return [];
-  });
 
   // Motor Job Card State (clientName suggested as 'Ralfin Electricals, Bangalore', motor power KW and HP left blank)
   const [jobCard, setJobCard] = useState<MotorJobCard>(() => {
@@ -140,20 +112,10 @@ export default function App() {
   });
 
   // Modals state
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isSWGTableOpen, setIsSWGTableOpen] = useState(false);
 
   // Active view mode for narrow screens / mobile: 'select' | 'suggestions' | 'jobcard'
   const [activeTab, setActiveTab] = useState<'calc' | 'jobcard'>('calc');
-
-  // Save history to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
-    } catch (e) {
-      console.error('Failed to save history to localStorage', e);
-    }
-  }, [history]);
 
   // Save jobCard draft
   useEffect(() => {
@@ -284,35 +246,6 @@ export default function App() {
     setActiveTab('calc');
   }, []);
 
-  // Presets
-  const handleApplyPreset = useCallback(
-    (presetKey: string) => {
-      const findW = (g: string) => swgTable.find((w) => w.swg === g);
-      if (presetKey === 'single18') {
-        const w18 = findW('18');
-        if (w18) setSelectedWires([{ wire: w18, count: 1 }]);
-      } else if (presetKey === 'mix18_20') {
-        const w18 = findW('18');
-        const w20 = findW('20');
-        if (w18 && w20) {
-          setSelectedWires([
-            { wire: w18, count: 1 },
-            { wire: w20, count: 1 },
-          ]);
-        }
-      } else if (presetKey === 'double20') {
-        const w20 = findW('20');
-        if (w20) setSelectedWires([{ wire: w20, count: 2 }]);
-      } else if (presetKey === 'triple22') {
-        const w22 = findW('22');
-        if (w22) setSelectedWires([{ wire: w22, count: 3 }]);
-      }
-      setSelectedCombination(null);
-      setActiveTab('calc');
-    },
-    [swgTable]
-  );
-
   // Handle Select Combination
   // "On clicking the select button, the other suggestions can disappear and this information including original combination and its area and the new selected combination and its area can be saved in a pdf file, and shared."
   const handleSelectCombination = (comb: SuggestedCombination) => {
@@ -327,77 +260,13 @@ export default function App() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }, 60);
-
-    // Auto record to history
-    const historyItem: CalculationHistoryItem = {
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString(),
-      dateFormatted: new Date().toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-      originalWires: selectedWires.map((item) => ({
-        swg: item.wire.swg,
-        mm: item.wire.mm,
-        area: item.wire.area,
-        count: item.count,
-      })),
-      originalTotalArea,
-      selectedCombination: comb,
-      jobCard,
-    };
-
-    setHistory((prev) => [historyItem, ...prev.slice(0, 29)]);
-  };
-
-  // Load history item
-  const handleLoadHistoryItem = (item: CalculationHistoryItem) => {
-    const loadedSelectedWires: SelectedWireItem[] = item.originalWires
-      .map((ow) => {
-        const wire =
-          swgTable.find((w) => w.swg === ow.swg) || {
-            swg: ow.swg,
-            swgNum: parseInt(ow.swg, 10) || 0,
-            mm: ow.mm,
-            inch: ow.mm / 25.4,
-            area: ow.area,
-          };
-        return {
-          wire,
-          count: ow.count,
-        };
-      })
-      .filter(Boolean);
-
-    setSelectedWires(loadedSelectedWires);
-    setSelectedCombination(item.selectedCombination);
-    if (item.jobCard) {
-      setJobCard(item.jobCard);
-    }
-    setIsHistoryOpen(false);
-    setActiveTab('jobcard');
-  };
-
-  const handleClearHistory = () => {
-    if (window.confirm('Are you sure you want to clear your calculation history?')) {
-      setHistory([]);
-    }
-  };
-
-  const handleDeleteHistoryItem = (id: string) => {
-    setHistory((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (
     <div className="min-h-screen bg-slate-100/90 text-slate-800 flex flex-col font-sans antialiased">
       {/* 1. Header with Company Branding & Developer Info */}
       <Header
-        onOpenHistory={() => setIsHistoryOpen(true)}
         onOpenSWGTable={() => setIsSWGTableOpen(true)}
-        historyCount={history.length}
       />
 
       {/* 2. Mobile/Tablet/Foldable Step Indicator Bar */}
@@ -414,7 +283,7 @@ export default function App() {
               }`}
             >
               <Layers className="w-4 h-4" />
-              <span>1. Wire Selection & Suggestions</span>
+              <span>{t('step1Title')}</span>
             </button>
 
             <button
@@ -431,7 +300,7 @@ export default function App() {
               }`}
             >
               <FileCheck2 className="w-4 h-4" />
-              <span>2. Motor Job Card & PDF Export</span>
+              <span>{t('step2Title')}</span>
               {selectedCombination && activeTab !== 'jobcard' && (
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
               )}
@@ -440,7 +309,7 @@ export default function App() {
 
           {/* Persistent Live Total Callout */}
           <div className="hidden sm:flex items-center gap-2 text-xs">
-            <span className="text-slate-500">Original Total:</span>
+            <span className="text-slate-500">{t('originalTotal')}:</span>
             <span className="font-mono font-extrabold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-300">
               {originalTotalArea.toFixed(4)} mm²
             </span>
@@ -459,9 +328,6 @@ export default function App() {
             jobCard={jobCard}
             onChangeJobCard={setJobCard}
             onBackToSuggestions={() => setActiveTab('calc')}
-            onSavedToHistory={() => {
-              // already added, or can update
-            }}
             tolerancePct={tolerancePct}
             maxVariancePct={maxVariancePct}
           />
@@ -476,7 +342,6 @@ export default function App() {
               onIncrementWire={handleIncrementWire}
               onDecrementWire={handleDecrementWire}
               onClearAll={handleClearAll}
-              onApplyPreset={handleApplyPreset}
             />
 
             {/* Middle Section: Original Wires Breakdown (Showing the totalling with one wire per row) */}
@@ -508,15 +373,6 @@ export default function App() {
       <FeedbackFooter />
 
       {/* Modals */}
-      <HistoryModal
-        isOpen={isHistoryOpen}
-        onClose={() => setIsHistoryOpen(false)}
-        history={history}
-        onLoadHistoryItem={handleLoadHistoryItem}
-        onClearHistory={handleClearHistory}
-        onDeleteHistoryItem={handleDeleteHistoryItem}
-      />
-
       <SWGTableModal
         isOpen={isSWGTableOpen}
         onClose={() => setIsSWGTableOpen(false)}

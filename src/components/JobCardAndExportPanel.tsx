@@ -24,6 +24,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { OutputDataPreviewModal } from './OutputDataPreviewModal';
+import { useLanguage } from '../i18n';
 
 interface JobCardAndExportPanelProps {
   originalWires: SelectedWireItem[];
@@ -32,7 +33,6 @@ interface JobCardAndExportPanelProps {
   jobCard: MotorJobCard;
   onChangeJobCard: (card: MotorJobCard) => void;
   onBackToSuggestions: () => void;
-  onSavedToHistory?: () => void;
   tolerancePct?: number;
   maxVariancePct?: number;
 }
@@ -44,10 +44,10 @@ export const JobCardAndExportPanel: React.FC<JobCardAndExportPanelProps> = ({
   jobCard,
   onChangeJobCard,
   onBackToSuggestions,
-  onSavedToHistory,
-  tolerancePct = 1.0,
+  tolerancePct = 1.5,
   maxVariancePct = 30,
 }) => {
+  const { t } = useLanguage();
   const [isExporting, setIsExporting] = useState(false);
   const [shareSuccess, setShareSuccess] = useState<string | null>(null);
   const [showOutputDataModal, setShowOutputDataModal] = useState(false);
@@ -140,7 +140,6 @@ export const JobCardAndExportPanel: React.FC<JobCardAndExportPanelProps> = ({
 
       setShareSuccess('PDF Job Card downloaded successfully!');
       setTimeout(() => setShareSuccess(null), 4000);
-      onSavedToHistory?.();
     } catch (err) {
       console.error('PDF export error:', err);
       alert('Error creating PDF. Please try again.');
@@ -199,7 +198,7 @@ Developed by Lukhman (+91-7019192462)`;
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 transition shadow-2xs"
           >
             <ArrowLeft className="w-4 h-4 text-amber-600" />
-            <span>Change Alternate Selection</span>
+            <span>{t('changeAlternate')}</span>
           </button>
           <span className="text-xs text-slate-500 hidden sm:inline">•</span>
           <span className="text-xs sm:text-sm font-bold text-slate-900 hidden sm:inline">
@@ -226,7 +225,7 @@ Developed by Lukhman (+91-7019192462)`;
             title="Scroll to Winding Job Card Form"
           >
             <FileText className="w-4 h-4 text-amber-400" />
-            <span>Winding Job Card Form</span>
+            <span>{t('motorAndClientDetails')}</span>
           </button>
 
           {/* Button to display output form/data before creating output PDF */}
@@ -237,7 +236,7 @@ Developed by Lukhman (+91-7019192462)`;
             title="Display Output Form & Calculation Data Preview"
           >
             <Eye className="w-4 h-4 text-amber-700" />
-            <span>Display Output Form / Data</span>
+            <span>{t('displayOutputForm')}</span>
           </button>
 
           {/* Print button right next to Download PDF button */}
@@ -248,7 +247,7 @@ Developed by Lukhman (+91-7019192462)`;
             title="Print Job Card directly without generating PDF"
           >
             <Printer className="w-4 h-4 text-amber-400" />
-            <span>Print</span>
+            <span>{t('print')}</span>
           </button>
 
           <button
@@ -257,7 +256,7 @@ Developed by Lukhman (+91-7019192462)`;
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold bg-amber-600 hover:bg-amber-700 text-white transition shadow-sm"
           >
             <Download className="w-4 h-4" />
-            <span>{isExporting ? 'Generating PDF...' : 'Download PDF Job Card'}</span>
+            <span>{isExporting ? 'Generating PDF...' : t('downloadPdfJobCard')}</span>
           </button>
         </div>
       </div>

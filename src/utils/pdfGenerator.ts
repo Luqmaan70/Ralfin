@@ -16,7 +16,7 @@ export function generateJobCardPDF({
   originalWires,
   originalTotalArea,
   selectedCombination,
-  tolerancePct = 1.0,
+  tolerancePct = 1.5,
   maxVariancePct = 30,
 }: PDFExportParams): jsPDF {
   const doc = new jsPDF({
@@ -67,7 +67,7 @@ export function generateJobCardPDF({
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(255, 255, 255);
-  doc.text(`Date of PDF Generation: ${currentDate}`, pageWidth - 14, 9.5, { align: 'right' });
+  doc.text(`Date of Report Generation: ${currentDate}`, pageWidth - 14, 9.5, { align: 'right' });
 
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');

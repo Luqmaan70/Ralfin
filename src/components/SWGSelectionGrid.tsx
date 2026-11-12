@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { SWGWire, SelectedWireItem } from '../types';
 import { COMMON_WINDING_SWG_LIST } from '../data/swgData';
-import { Search, Plus, Minus, Check, RotateCcw, Filter, Layers } from 'lucide-react';
+import { Plus, Minus, Check, RotateCcw, Filter, Layers } from 'lucide-react';
+import { useLanguage } from '../i18n';
 
 interface SWGSelectionGridProps {
   swgTable: SWGWire[];
@@ -10,7 +11,6 @@ interface SWGSelectionGridProps {
   onIncrementWire: (wire: SWGWire) => void;
   onDecrementWire: (wire: SWGWire) => void;
   onClearAll: () => void;
-  onApplyPreset: (presetName: string) => void;
 }
 
 export const SWGSelectionGrid: React.FC<SWGSelectionGridProps> = ({
@@ -20,9 +20,8 @@ export const SWGSelectionGrid: React.FC<SWGSelectionGridProps> = ({
   onIncrementWire,
   onDecrementWire,
   onClearAll,
-  onApplyPreset,
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useLanguage();
   const [filterMode, setFilterMode] = useState<'common' | 'all' | 'selected'>('common');
 
   // Map of selected SWG to count for O(1) lookup
@@ -40,27 +39,14 @@ export const SWGSelectionGrid: React.FC<SWGSelectionGridProps> = ({
 
   // Filtered wires
   const filteredWires = useMemo(() => {
-    return swgTable.filter((wire) => {
-      const q = searchQuery.trim().toLowerCase();
-      const normalizedQ = q.replace('.5', '½').replace('1/2', '½');
-      const matchesQuery =
-        !q ||
-        wire.swg.toLowerCase().includes(q) ||
-        wire.swg.toLowerCase().includes(normalizedQ) ||
-        wire.mm.toString().includes(q) ||
-        wire.area.toFixed(3).includes(q);
-
-      if (!matchesQuery) return false;
-
-      if (filterMode === 'selected') {
-        return (selectedMap.get(wire.swg) || 0) > 0;
-      }
-      if (filterMode === 'common') {
-        return COMMON_WINDING_SWG_LIST.includes(wire.swg);
-      }
-      return true; // 'all'
-    });
-  }, [swgTable, searchQuery, filterMode, selectedMap]);
+    if (filterMode === 'selected') {
+      return swgTable.filter((wire) => (selectedMap.get(wire.swg) || 0) > 0);
+    }
+    if (filterMode === 'common') {
+      return swgTable.filter((wire) => COMMON_WINDING_SWG_LIST.includes(wire.swg));
+    }
+    return swgTable; // 'all'
+  }, [swgTable, filterMode, selectedMap]);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -72,7 +58,7 @@ export const SWGSelectionGrid: React.FC<SWGSelectionGridProps> = ({
           </div>
           <div>
             <h3 className="text-base sm:text-lg font-bold text-slate-900">
-              Select Original Motor Wires
+              {t('selectOriginalWires')}
             </h3>
             <p className="text-xs text-slate-500">
               Pick wires from the Standard Wire Gauge (SWG) chart. Multiple wires of the same gauge are supported.
@@ -85,68 +71,48 @@ export const SWGSelectionGrid: React.FC<SWGSelectionGridProps> = ({
           {totalWiresCount > 0 && (
             <>
               <span className="px-2.5 py-1 text-xs font-bold bg-amber-100 text-amber-900 rounded-full border border-amber-300">
-                {totalWiresCount} wire{totalWiresCount > 1 ? 's' : ''} selected
+                {totalWiresCount} {t('strands')}
               </span>
               <button
                 onClick={onClearAll}
                 className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition"
-                title="Reset selection"
+                title={t('clearAll')}
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span>Reset</span>
+                <span>{t('clearAll')}</span>
               </button>
             </>
           )}
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="p-3 sm:p-4 bg-slate-50/70 border-b border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-        {/* Search Input */}
-        <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
-            placeholder="Search by gauge (e.g. 18) or dia (e.g. 1.219)..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 uppercase"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600"
-            >
-              ×
-            </button>
-          )}
-        </div>
-
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-1 p-1 bg-slate-200/80 rounded-lg text-xs font-medium self-start sm:self-auto shrink-0">
+      {/* Filter Tabs Bar (Search deleted as requested) */}
+      <div className="px-3 sm:px-4 py-2 bg-slate-50/70 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+        <span className="text-xs font-bold text-slate-600">Gauge Filter:</span>
+        <div className="flex items-center gap-1 p-1 bg-slate-200/80 rounded-lg text-xs font-medium">
           <button
             onClick={() => setFilterMode('common')}
-            className={`px-2.5 py-1 rounded-md transition ${
+            className={`px-3 py-1 rounded-md transition ${
               filterMode === 'common'
                 ? 'bg-white text-slate-900 font-bold shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Motor Gauges (12-38)
+            {t('commonGauges')}
           </button>
           <button
             onClick={() => setFilterMode('all')}
-            className={`px-2.5 py-1 rounded-md transition ${
+            className={`px-3 py-1 rounded-md transition ${
               filterMode === 'all'
                 ? 'bg-white text-slate-900 font-bold shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            All SWG ({swgTable.length})
+            {t('allGauges')} ({swgTable.length})
           </button>
           <button
             onClick={() => setFilterMode('selected')}
-            className={`px-2.5 py-1 rounded-md transition flex items-center gap-1 ${
+            className={`px-3 py-1 rounded-md transition flex items-center gap-1 ${
               filterMode === 'selected'
                 ? 'bg-white text-slate-900 font-bold shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
@@ -162,34 +128,7 @@ export const SWGSelectionGrid: React.FC<SWGSelectionGridProps> = ({
         </div>
       </div>
 
-      {/* Preset Quick Picks */}
-      <div className="px-3 sm:px-4 py-2 bg-amber-50/40 border-b border-amber-100/70 flex flex-wrap items-center gap-1.5 text-xs">
-        <span className="text-slate-500 font-medium">Quick Examples:</span>
-        <button
-          onClick={() => onApplyPreset('single18')}
-          className="px-2 py-0.5 rounded bg-white hover:bg-amber-100 text-slate-700 border border-slate-200 hover:border-amber-300 transition"
-        >
-          1× 18 SWG
-        </button>
-        <button
-          onClick={() => onApplyPreset('mix18_20')}
-          className="px-2 py-0.5 rounded bg-white hover:bg-amber-100 text-slate-700 border border-slate-200 hover:border-amber-300 transition"
-        >
-          1× 18 SWG + 1× 20 SWG
-        </button>
-        <button
-          onClick={() => onApplyPreset('double20')}
-          className="px-2 py-0.5 rounded bg-white hover:bg-amber-100 text-slate-700 border border-slate-200 hover:border-amber-300 transition"
-        >
-          2× 20 SWG
-        </button>
-        <button
-          onClick={() => onApplyPreset('triple22')}
-          className="px-2 py-0.5 rounded bg-white hover:bg-amber-100 text-slate-700 border border-slate-200 hover:border-amber-300 transition"
-        >
-          3× 22 SWG
-        </button>
-      </div>
+
 
       {/* The SWG Wires Grid/List */}
       <div className="p-2 sm:p-3 max-h-[360px] sm:max-h-[420px] overflow-y-auto">

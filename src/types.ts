@@ -57,12 +57,3 @@ export interface MotorJobCard {
   remarks: string;
 }
 
-export interface CalculationHistoryItem {
-  id: string;
-  timestamp: string;
-  dateFormatted: string;
-  originalWires: { swg: string; mm: number; area: number; count: number }[];
-  originalTotalArea: number;
-  selectedCombination: SuggestedCombination;
-  jobCard: MotorJobCard;
-}

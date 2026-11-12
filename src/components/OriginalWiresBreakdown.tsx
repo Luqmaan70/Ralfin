@@ -69,7 +69,7 @@ export const OriginalWiresBreakdown: React.FC<OriginalWiresBreakdownProps> = ({
               {t('originalBreakdown')}
             </h3>
             <p className="text-[11px] text-slate-300">
-              {flattenedWires.length} {t('strands')}
+              {flattenedWires.length} {flattenedWires.length === 1 ? 'wire' : 'wires'}
             </p>
           </div>
         </div>
@@ -148,7 +148,7 @@ export const OriginalWiresBreakdown: React.FC<OriginalWiresBreakdownProps> = ({
                 TOTAL
               </td>
               <td className="py-3 px-3 sm:px-4 text-amber-900">
-                {flattenedWires.length} {t('strands')}
+                {flattenedWires.length} {flattenedWires.length === 1 ? 'wire' : 'wires'}
               </td>
               <td className="py-3 px-3 sm:px-4 text-right text-slate-400">
                 —

@@ -132,8 +132,28 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
+          {/* WhatsApp Technical Discussion Announcement Banner at the top */}
+          <div className="mt-2.5 py-2 px-3.5 bg-emerald-950/70 border border-emerald-500/40 rounded-lg text-emerald-100 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span className="font-medium text-emerald-100">
+                Feel free to discuss on WhatsApp about winding design, layout, connection diagrams, dual speed winding, etc.
+              </span>
+            </div>
+            <a
+              href="https://wa.me/917019192462?text=Hello%20Lukhman,%20I%20would%20like%20to%20discuss%20winding%20design,%20layout,%20connection%20diagrams,%20dual%20speed%20winding:"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-md transition shadow-xs shrink-0"
+              title="Chat on WhatsApp with Lukhman"
+            >
+              <span>Chat on WhatsApp</span>
+              <span className="font-mono text-[11px] opacity-90">(+91-7019192462)</span>
+            </a>
+          </div>
+
           {/* PROMINENT CELL OF A DIFFERENT COLOR WITH BIGGER FONT */}
-          <div className="mt-3 p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 border-2 border-amber-300/80 shadow-lg flex items-center justify-between gap-3 text-white">
+          <div className="mt-2.5 p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 border-2 border-amber-300/80 shadow-lg flex items-center justify-between gap-3 text-white">
             <div className="flex items-center gap-3 sm:gap-3.5">
               <div className="p-2 sm:p-2.5 bg-slate-950/40 rounded-xl border border-amber-200/50 shadow-inner shrink-0">
                 <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-amber-300 animate-pulse" />
@@ -222,6 +242,19 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
                 <p className="text-[11px] text-slate-500">
                   You can copy the code, paste it into Notepad or TextEdit on your computer, and save it as <code>wire_calculator.html</code>.
+                </p>
+              </div>
+
+              {/* iPhone / iPad Important Notice */}
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-1 text-slate-800">
+                <div className="flex items-center gap-1.5 font-bold text-xs text-amber-900">
+                  <span>📱 Important for iPhone & iPad Users:</span>
+                </div>
+                <p className="text-[11px] text-amber-800 leading-normal">
+                  If you download this file and open it inside WhatsApp, Mail, or the iOS <strong>Files app</strong>, Apple's built-in <em>Quick Look preview disables JavaScript</em> for security, so buttons will not click.
+                </p>
+                <p className="text-[11px] text-amber-900 font-semibold leading-normal pt-0.5">
+                  👉 <strong>Best way on iPhone:</strong> Click &quot;Open Standalone in New Tab&quot; in Safari, tap the Share icon (📤), and tap <strong>&quot;Add to Home Screen&quot;</strong> to install it as an offline 1-tap app!
                 </p>
               </div>
 

@@ -2,9 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Wire Calc">
+  <meta name="format-detection" content="telephone=no">
   <title>Alternate Wire Gauge Calculator for Motor Winding - Ralfin Electricals, Bangalore (Standalone Offline App)</title>
-  <meta name="description" content="Standalone Offline Alternate Wire Gauge Calculator for Motor Winding by Ralfin Electricals, Bangalore. Calculate equivalent SWG combinations, generate motor winding job cards, and print directly. Developed by Lukhman (+91-7019192462).">
+  <meta name="description" content="Standalone Offline Alternate Wire Gauge Calculator for Motor Winding by Ralfin Electricals, Bangalore. Calculate equivalent SWG combinations. Developed by Lukhman (+91-7019192462).">
   <style>
     /* Reset & Base Fonts */
     *, *::before, *::after {
@@ -308,6 +312,13 @@
       transition: all 0.12s;
       position: relative;
       user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      font: inherit;
+      outline: none;
+      width: 100%;
+      box-sizing: border-box;
     }
     .swg-tile:hover {
       border-color: #f59e0b;
@@ -449,11 +460,45 @@
     }
     .custom-range {
       width: 100%;
-      height: 5px;
-      border-radius: 3px;
+      height: 8px;
+      border-radius: 4px;
       outline: none;
       -webkit-appearance: none;
+      appearance: none;
       cursor: pointer;
+      touch-action: manipulation;
+    }
+    .custom-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+    .range-yellow::-webkit-slider-thumb {
+      background: #facc15;
+      border: 2px solid #713f12;
+    }
+    .range-green::-webkit-slider-thumb {
+      background: #4ade80;
+      border: 2px solid #14532d;
+    }
+    .custom-range::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+    .range-yellow::-moz-range-thumb {
+      background: #facc15;
+      border: 2px solid #713f12;
+    }
+    .range-green::-moz-range-thumb {
+      background: #4ade80;
+      border: 2px solid #14532d;
     }
     .range-yellow {
       background: #422006;
@@ -480,106 +525,64 @@
       gap: 0.5rem;
       margin-bottom: 0.75rem;
     }
-    .suggestions-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-    }
-    @media (min-width: 640px) {
-      .suggestions-grid {
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      }
-    }
-    .comb-card {
-      background-color: #ffffff;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 0.85rem;
-      transition: all 0.15s;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    }
-    .comb-card:hover {
-      border-color: #d97706;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    }
-    .comb-card.is-adjacent {
-      border-color: #f59e0b;
-      background: linear-gradient(to bottom, #fffbeb, #ffffff);
-    }
-    .adjacent-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-      background-color: #fef3c7;
-      color: #92400e;
-      font-size: 0.65rem;
-      font-weight: 800;
-      padding: 0.15rem 0.45rem;
-      border-radius: 4px;
-      border: 1px solid #fde68a;
-      margin-bottom: 0.4rem;
-    }
-    .comb-gauges {
-      font-size: 1.05rem;
-      font-weight: 900;
-      color: #0f172a;
-      margin-bottom: 0.35rem;
-    }
-    .comb-stats {
-      font-size: 0.75rem;
-      color: #475569;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.35rem;
-      margin-bottom: 0.75rem;
-    }
-    .stat-label {
-      color: #64748b;
-      font-size: 0.7rem;
-    }
-
-    /* Job Card Form */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-    }
-    @media (min-width: 640px) {
-      .form-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-    @media (min-width: 1024px) {
-      .form-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-    .form-group label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #334155;
-    }
-    .form-input {
-      padding: 0.4rem 0.65rem;
+    /* Suggestions Table Form */
+    .suggestions-table-container {
+      width: 100%;
+      overflow-x: auto;
       border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      color: #0f172a;
-      background-color: #ffffff;
-      outline: none;
-      transition: border-color 0.15s;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .form-input:focus {
-      border-color: #d97706;
-      box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.2);
+    .suggestions-master-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.8rem;
+      min-width: 100%;
+    }
+    .suggestions-master-table thead tr {
+      background-color: #0f172a;
+      color: #ffffff;
+    }
+    .suggestions-master-table th {
+      padding: 0.65rem 0.85rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 800;
+      border: none;
+    }
+    .comb-header-row td {
+      background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
+      color: #ffffff;
+      padding: 0.65rem 0.85rem;
+      border-top: 2px solid #475569;
+      border-bottom: 1px solid #334155;
+    }
+    .comb-wire-row td {
+      padding: 0.5rem 0.85rem;
+      border-bottom: 1px solid #f1f5f9;
+      color: #1e293b;
+    }
+    .comb-wire-row:hover td {
+      background-color: #fffbeb;
+    }
+    .comb-total-row td {
+      background-color: #fef3c7;
+      border-bottom: 2px solid #cbd5e1;
+      padding: 0.65rem 0.85rem;
+      font-weight: 800;
+      color: #451a03;
+    }
+    .comb-total-area-cell {
+      background-color: #fde68a !important;
+      border-left: 1px solid #f59e0b;
+      border-right: 1px solid #f59e0b;
+      font-family: monospace;
+      font-size: 0.95rem;
+      font-weight: 900;
+      color: #78350f;
     }
 
     /* Modals */
@@ -673,36 +676,6 @@
       }
     }
 
-    /* ======================================================== */
-    /* DEDICATED PRINT STYLES (A4 Portrait Browser Print) */
-    /* ======================================================== */
-    #print-document {
-      display: none;
-    }
-    @media print {
-      @page {
-        size: A4 portrait;
-        margin: 8mm 10mm 10mm 10mm;
-      }
-      html, body {
-        background-color: #ffffff !important;
-        color: #0f172a !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-      header, footer, .screen-only, .btn, .sliders-panel, .presets-bar, .modal-overlay {
-        display: none !important;
-      }
-      #print-document {
-        display: block !important;
-        font-family: system-ui, -apple-system, sans-serif;
-        color: #000000;
-      }
-      .print-avoid-break {
-        break-inside: avoid !important;
-        page-break-inside: avoid !important;
-      }
-    }
   </style>
 </head>
 <body>
@@ -733,6 +706,10 @@
         </div>
 
         <div class="nav-buttons">
+          <button class="btn btn-dark" onclick="openIphoneHelpModal()" title="How to run on iPhone / iOS" style="border-color: rgba(56, 189, 248, 0.4); color: #e0f2fe;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+            <span>iPhone Guide</span>
+          </button>
           <button class="btn btn-dark" onclick="openSWGTableModal()" title="View Standard Wire Gauge Chart">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M12 3v18M3 12h18M3 3h18v18H3z"/></svg>
             <span id="btn-swg-text">SWG Chart</span>
@@ -740,12 +717,26 @@
         </div>
       </div>
 
+      <!-- WhatsApp Discussion Announcement Banner at the top -->
+      <div style="margin-top: 0.65rem; padding: 0.6rem 0.85rem; background: rgba(6, 78, 59, 0.7); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 8px; color: #d1fae5; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; font-size: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          <span style="font-weight: 500;">
+            Feel free to discuss on WhatsApp about winding design, layout, connection diagrams, dual speed winding, etc.
+          </span>
+        </div>
+        <a href="https://wa.me/917019192462?text=Hello%20Lukhman,%20I%20would%20like%20to%20discuss%20winding%20design,%20layout,%20connection%20diagrams,%20dual%20speed%20winding:" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.75rem; background: #059669; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 0.75rem; transition: background 0.15s;">
+          <span>Chat on WhatsApp (+91-7019192462)</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+        </a>
+      </div>
+
       <!-- Prominent Title Card -->
-      <div class="hero-banner">
+      <div class="hero-banner" style="margin-top: 0.65rem;">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fef08a" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         <div>
           <h2>Alternate Wire Gauge Calculator for Motor Winding</h2>
-          <p>Accurate parallel strand substitution • Adjacent wire replacement rule • Standalone offline ready</p>
+          <p>Accurate parallel wire substitution • Adjacent wire replacement rule • Standalone offline ready</p>
         </div>
       </div>
     </div>
@@ -754,12 +745,29 @@
   <!-- Screen Main -->
   <main class="max-w-7xl screen-only">
 
+    <!-- Noscript Warning (Crucial for iOS QuickLook preview where JS is blocked) -->
+    <noscript>
+      <div style="background-color: #fef2f2; border: 2px solid #ef4444; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem; color: #991b1b;">
+        <h4 style="font-weight: 800; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+          ⚠️ JavaScript is Disabled (Important for iPhone Users)
+        </h4>
+        <p style="font-size: 0.825rem; line-height: 1.45;">
+          If you opened this downloaded file inside the iPhone <strong>Files</strong> app or from <strong>WhatsApp</strong>, iOS uses <em>Quick Look preview</em>, which <strong>strictly blocks JavaScript from executing</strong> for system security. That is why buttons and calculations do not react.
+        </p>
+        <div style="margin-top: 0.6rem; padding: 0.6rem; background: #ffffff; border-radius: 6px; border: 1px solid #fecaca; font-size: 0.8rem; line-height: 1.45; color: #1e293b;">
+          <strong>How to run this on iPhone:</strong><br>
+          1. <strong>Direct Safari (Best):</strong> Open the link in Safari, tap the <strong>Share</strong> icon (square with arrow up), and tap <strong>"Add to Home Screen"</strong>. It installs as a real app icon and works offline!<br>
+          2. <strong>Offline File:</strong> Open the file using the free <strong>"Documents by Readdle"</strong> or <strong>"HTML Viewer"</strong> app from the App Store, which has full JavaScript enabled.
+        </div>
+      </div>
+    </noscript>
+
     <!-- Card 1: SWG Wire Selection -->
     <div class="card">
       <div class="card-header">
         <h3>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24M14.83 9.17l4.24-4.24M14.83 14.83l4.24 4.24M9.17 14.83l-4.24 4.24"/></svg>
-          <span>Step 1: Select Original Motor Wires (Strands)</span>
+          <span>Step 1: Select Original Motor Wires</span>
         </h3>
         <div style="display: flex; gap: 0.5rem;">
           <button class="btn btn-dark" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;" onclick="clearAllWires()">Clear All</button>
@@ -782,7 +790,7 @@
       <div class="card-header" style="background-color: #1e293b;">
         <h3>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          <span>Original Wires Breakdown (<span id="orig-strand-count">0</span> Strands)</span>
+          <span>Original Wires Breakdown (<span id="orig-strand-count">0</span> Wires)</span>
         </h3>
         <span class="font-mono" style="color: #fcd34d; font-weight: 900; font-size: 0.95rem;">
           Total: <span id="orig-total-area-callout">0.0000</span> mm²
@@ -805,7 +813,7 @@
             <tfoot>
               <tr class="table-total-row">
                 <td colspan="2" style="font-weight: 900; text-transform: uppercase;">Original Combined Total</td>
-                <td colspan="2" style="text-align: right; color: #64748b; font-size: 0.75rem;"><span id="orig-footer-strands">0</span> strands</td>
+                <td colspan="2" style="text-align: right; color: #64748b; font-size: 0.75rem;"><span id="orig-footer-strands">0</span> wires</td>
                 <td style="text-align: right; font-weight: 900; color: #0f172a; font-family: monospace; font-size: 0.9rem;" id="orig-footer-total-area">0.0000 mm²</td>
                 <td></td>
               </tr>
@@ -832,10 +840,10 @@
           </div>
         </div>
 
-        <!-- Neon Green Strand Variance Slider -->
+        <!-- Neon Green Wire Variance Slider -->
         <div class="slider-box slider-box-green">
           <div class="slider-header">
-            <span class="slider-title" style="color: #bbf7d0;">Strand-to-Strand Variance</span>
+            <span class="slider-title" style="color: #bbf7d0;">Wire-to-Wire Variance</span>
             <span class="badge-neon-green" id="val-variance">30%</span>
           </div>
           <input type="range" min="0" max="50" step="1" value="30" class="custom-range range-green" id="slider-variance" oninput="onVarianceSliderChange(this.value)">
@@ -859,95 +867,6 @@
       </div>
       <div class="card-body">
         <div class="suggestions-grid" id="suggestions-grid"></div>
-      </div>
-    </div>
-
-    <!-- Card 5: Selected Job Card & Verification Form -->
-    <div class="card" id="job-card-panel" style="display: none;">
-      <div class="card-header" style="background-color: #9a3412;">
-        <h3>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fcd34d" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          <span>Step 3: Engineering Verification & Motor Job Card Form</span>
-        </h3>
-        <div style="display: flex; gap: 0.5rem;">
-          <button class="btn btn-dark" onclick="openOutputPreviewModal()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            <span>Display Output Form / Data</span>
-          </button>
-          <button class="btn btn-dark" onclick="triggerBrowserPrint()" title="Print Job Card directly without generating PDF">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fcd34d" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            <span>Print</span>
-          </button>
-        </div>
-      </div>
-      <div class="card-body">
-        <!-- Side by Side Tables -->
-        <div style="display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1rem;" id="side-by-side-wrap">
-          <!-- Populated dynamically -->
-        </div>
-
-        <!-- Form fields (Uppercase, blank HP/desc by default) -->
-        <h4 style="font-size: 0.85rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.6rem; color: #0f172a;">
-          Motor Specifications & Client Details
-        </h4>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Name of Client / Company</label>
-            <input type="text" id="inp-client" class="form-input uppercase-input" value="RALFIN ELECTRICALS, BANGALORE">
-          </div>
-          <div class="form-group">
-            <label>Contact Phone</label>
-            <input type="text" id="inp-phone" class="form-input uppercase-input" placeholder="+91-">
-          </div>
-          <div class="form-group">
-            <label>Motor Description</label>
-            <input type="text" id="inp-motor-desc" class="form-input uppercase-input" placeholder="LEAVE BLANK OR ENTER SPEC">
-          </div>
-          <div class="form-group">
-            <label>Power (KW)</label>
-            <input type="text" id="inp-power-kw" class="form-input uppercase-input" placeholder="KW (e.g. 0.75, 7.5)" oninput="autoCalculateHP(this.value)">
-          </div>
-          <div class="form-group">
-            <label>Horse Power (HP) [Auto]</label>
-            <input type="text" id="inp-hp" class="form-input uppercase-input" placeholder="HP (Auto or enter)">
-          </div>
-          <div class="form-group">
-            <label>Voltage (V)</label>
-            <input type="text" id="inp-voltage" class="form-input uppercase-input" value="415">
-          </div>
-          <div class="form-group">
-            <label>Speed (RPM)</label>
-            <input type="text" id="inp-rpm" class="form-input uppercase-input" value="1440">
-          </div>
-          <div class="form-group">
-            <label>Poles / Phases</label>
-            <input type="text" id="inp-poles-phases" class="form-input uppercase-input" value="4 POLES / 3 PHASE">
-          </div>
-          <div class="form-group">
-            <label>Bearings</label>
-            <input type="text" id="inp-bearings" class="form-input uppercase-input" placeholder="e.g. 6205-2RS">
-          </div>
-          <div class="form-group" style="grid-column: span 1;">
-            <label>Mounting</label>
-            <input type="text" id="inp-mounting" class="form-input uppercase-input" placeholder="e.g. B3 FOOT MOUNTED">
-          </div>
-          <div class="form-group" style="grid-column: 1 / -1;">
-            <label>Remarks</label>
-            <textarea id="inp-remarks" class="form-input uppercase-input" rows="2" placeholder="e.g. DUAL LAYER WINDING, CLASS F INSULATION, VPI VARNISH"></textarea>
-          </div>
-        </div>
-
-        <!-- Action bar -->
-        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 0.5rem;">
-          <button class="btn btn-outline" onclick="openOutputPreviewModal()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            <span>Display Output Form / Data</span>
-          </button>
-          <button class="btn btn-amber" onclick="triggerBrowserPrint()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            <span>Print Job Card</span>
-          </button>
-        </div>
       </div>
     </div>
 
@@ -981,156 +900,6 @@
     </div>
   </footer>
 
-  <!-- ======================================================== -->
-  <!-- DEDICATED PRINTABLE DOCUMENT (Visible ONLY when Printing) -->
-  <!-- ======================================================== -->
-  <div id="print-document">
-    <!-- Letterhead -->
-    <div style="border-bottom: 2px solid #000000; padding-bottom: 6px; margin-bottom: 8px;">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-        <div>
-          <h1 style="font-size: 16pt; font-weight: 900; text-transform: uppercase; margin: 0; line-height: 1.1;">
-            RALFIN ELECTRICALS, BANGALORE
-          </h1>
-          <p style="font-size: 9pt; font-weight: 800; color: #9a3412; text-transform: uppercase; margin-top: 2px;">
-            Motor Winding Division • Engineering Job Card & Wire Calculation
-          </p>
-          <p style="font-size: 7.5pt; color: #475569; margin-top: 2px;">
-            Specialists in manufacture of 3 phase industrial AC motor, windings, rewinding, component manufacture, wire harness manufacture, etc.
-          </p>
-        </div>
-        <div style="text-align: right; font-size: 8pt;">
-          <p style="font-weight: 800;" id="print-date">Date: </p>
-          <p style="color: #64748b; font-size: 7.5pt; margin-top: 2px;">Developed by <strong>Lukhman</strong> (+91-7019192462)</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 1: Motor & Client Details -->
-    <div class="print-avoid-break" style="border: 1px solid #cbd5e1; margin-bottom: 8px; border-radius: 4px; overflow: hidden;">
-      <div style="background-color: #f1f5f9; padding: 4px 8px; border-bottom: 1px solid #cbd5e1; font-weight: 800; font-size: 8.5pt; text-transform: uppercase;">
-        1. Motor and Client Details
-      </div>
-      <div style="padding: 6px 8px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font-size: 8pt;" id="print-motor-details">
-        <!-- Injected dynamically -->
-      </div>
-    </div>
-
-    <!-- Section 2: Area Comparison Summary -->
-    <div class="print-avoid-break" style="border: 1px solid #cbd5e1; margin-bottom: 8px; border-radius: 4px; overflow: hidden;">
-      <div style="background-color: #f1f5f9; padding: 4px 8px; border-bottom: 1px solid #cbd5e1; font-weight: 800; font-size: 8.5pt; text-transform: uppercase;">
-        2. Cross-Sectional Area Comparison
-      </div>
-      <table style="width: 100%; font-size: 8pt; border-collapse: collapse;">
-        <thead>
-          <tr style="background-color: #f8fafc; font-size: 7.5pt; text-transform: uppercase; border-bottom: 1px solid #cbd5e1;">
-            <th style="padding: 4px 6px;">Parameter</th>
-            <th style="padding: 4px 6px;">Original Total Area</th>
-            <th style="padding: 4px 6px;">Alternate Total Area</th>
-            <th style="padding: 4px 6px;">Difference (mm² & %)</th>
-            <th style="padding: 4px 6px;">Strand Variance</th>
-            <th style="padding: 4px 6px;">Equivalent Diff</th>
-          </tr>
-        </thead>
-        <tbody id="print-area-comparison-body"></tbody>
-      </table>
-    </div>
-
-    <!-- Section 3: Side-by-Side Wire Combination Tables -->
-    <div class="print-avoid-break" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-      <!-- Original wires -->
-      <div style="border: 1px solid #cbd5e1; border-radius: 4px; overflow: hidden;">
-        <div style="background-color: #1e293b; color: #ffffff; padding: 4px 6px; font-weight: 800; font-size: 8pt; display: flex; justify-content: space-between;">
-          <span>Original Wire Combination</span>
-          <span id="print-orig-total-hdr" style="font-family: monospace;"></span>
-        </div>
-        <table style="width: 100%; font-size: 7.5pt; border-collapse: collapse;">
-          <thead>
-            <tr style="background-color: #f1f5f9; border-bottom: 1px solid #cbd5e1;">
-              <th style="padding: 3px 4px; width: 25px; text-align: center;">#</th>
-              <th style="padding: 3px 4px;">Gauge</th>
-              <th style="padding: 3px 4px; text-align: right;">Bare Dia</th>
-              <th style="padding: 3px 4px; text-align: right;">Area</th>
-            </tr>
-          </thead>
-          <tbody id="print-orig-wires-body"></tbody>
-          <tfoot>
-            <tr style="background-color: #f8fafc; font-weight: 800; border-top: 1.5px solid #000000;">
-              <td colspan="2" style="padding: 3px 4px;">TOTAL</td>
-              <td id="print-orig-strands-foot" style="padding: 3px 4px; text-align: right; font-size: 7pt; color: #64748b;"></td>
-              <td id="print-orig-area-foot" style="padding: 3px 4px; text-align: right; font-family: monospace;"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-
-      <!-- Alternate wires -->
-      <div style="border: 1px solid #cbd5e1; border-radius: 4px; overflow: hidden;">
-        <div style="background-color: #c2410c; color: #ffffff; padding: 4px 6px; font-weight: 800; font-size: 8pt; display: flex; justify-content: space-between;">
-          <span>Selected Alternate Combination</span>
-          <span id="print-alt-total-hdr" style="font-family: monospace;"></span>
-        </div>
-        <table style="width: 100%; font-size: 7.5pt; border-collapse: collapse;">
-          <thead>
-            <tr style="background-color: #f1f5f9; border-bottom: 1px solid #cbd5e1;">
-              <th style="padding: 3px 4px; width: 25px; text-align: center;">#</th>
-              <th style="padding: 3px 4px;">Gauge</th>
-              <th style="padding: 3px 4px; text-align: right;">Bare Dia</th>
-              <th style="padding: 3px 4px; text-align: right;">Area</th>
-            </tr>
-          </thead>
-          <tbody id="print-alt-wires-body"></tbody>
-          <tfoot>
-            <tr style="background-color: #fff7ed; font-weight: 800; border-top: 1.5px solid #ea580c;">
-              <td colspan="2" style="padding: 3px 4px;">TOTAL</td>
-              <td id="print-alt-strands-foot" style="padding: 3px 4px; text-align: right; font-size: 7pt; color: #c2410c;"></td>
-              <td id="print-alt-area-foot" style="padding: 3px 4px; text-align: right; font-family: monospace;"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </div>
-
-    <!-- Section 4: Signatures & Authorizations -->
-    <div class="print-avoid-break" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-      <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px;">
-        <span style="font-size: 7.5pt; font-weight: 800; text-transform: uppercase; display: block; color: #334155;">
-          Winding Supervisor Signature & Name:
-        </span>
-        <div style="height: 28px; border-bottom: 1px dashed #94a3b8; display: flex; align-items: flex-end;">
-          <span style="font-size: 7pt; color: #94a3b8; font-style: italic;">Signature / Name</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 7pt; color: #64748b; margin-top: 3px;">
-          <span>Date: _______________</span>
-          <span style="font-weight: 700; color: #000000;">Ralfin Electricals, Bangalore</span>
-        </div>
-      </div>
-
-      <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px;">
-        <span style="font-size: 7.5pt; font-weight: 800; text-transform: uppercase; display: block; color: #334155;">
-          Quality Inspector / Tested By:
-        </span>
-        <div style="height: 28px; border-bottom: 1px dashed #94a3b8; display: flex; align-items: flex-end;">
-          <span style="font-size: 7pt; color: #94a3b8; font-style: italic;">Signature / Name</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 7pt; color: #64748b; margin-top: 3px;">
-          <span>Date: _______________</span>
-          <span style="font-weight: 700; color: #000000;">QA Division</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Print Footer: 2-line wrapped WhatsApp feedback message -->
-    <div class="print-avoid-break" style="border-top: 1.5px solid #000000; padding-top: 4px; text-align: center; font-size: 7.5pt;">
-      <p style="font-weight: 800; color: #000000; margin: 0;">
-        Please send your feedback regarding improvements and additional features you need,
-      </p>
-      <p style="font-weight: 600; color: #334155; margin: 1px 0 0 0;">
-        to developer Lukhman at +91-7019192462 (Message on whatsapp only)
-      </p>
-    </div>
-  </div>
-
   <!-- SWG Table Reference Modal -->
   <div class="modal-overlay" id="modal-swg-table">
     <div class="modal-content">
@@ -1162,24 +931,60 @@
     </div>
   </div>
 
-  <!-- Output Data Preview Modal -->
-  <div class="modal-overlay" id="modal-preview">
-    <div class="modal-content" style="max-width: 950px;">
-      <div class="modal-header" style="background-color: #0f172a;">
-        <h3 style="font-size: 1rem; font-weight: 800; color: #fcd34d;">
-          Output Form & Calculation Data Preview
+  <!-- iPhone Guide Modal -->
+  <div class="modal-overlay" id="modal-iphone-help">
+    <div class="modal-content" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 style="font-size: 1rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+          <span>Why Doesn't Downloaded HTML Run on iPhone & How to Fix</span>
         </h3>
-        <button class="btn btn-dark" onclick="closeOutputPreviewModal()">✕ Close</button>
+        <button class="btn btn-dark" onclick="closeIphoneHelpModal()">✕ Close</button>
       </div>
-      <div class="modal-body" id="preview-modal-body">
-        <!-- Rendered dynamically -->
+      <div class="modal-body" style="font-size: 0.85rem; line-height: 1.5; color: #1e293b;">
+        <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem;">
+          <h4 style="color: #991b1b; font-weight: 800; font-size: 0.9rem; margin-bottom: 0.25rem;">
+            ⚠️ The Apple iOS "Quick Look" Restriction
+          </h4>
+          <p style="color: #7f1d1d; font-size: 0.8rem;">
+            When you download an HTML file on an iPhone and tap it in <strong>WhatsApp</strong>, <strong>Email</strong>, or the <strong>Files</strong> app, iOS opens it in Apple's <em>"Quick Look" previewer</em>. Apple deliberately <strong>disables all JavaScript execution</strong> inside Quick Look for security. Because this calculator uses JavaScript to calculate wire areas and parallel combinations, it cannot respond inside Quick Look.
+          </p>
+        </div>
+
+        <h4 style="font-weight: 800; color: #0f172a; margin-bottom: 0.5rem; font-size: 0.95rem;">
+          ✅ How to Run It Smoothly on iPhone (2 Easy Ways):
+        </h4>
+
+        <!-- Method 1 -->
+        <div style="border: 1.5px solid #d97706; background-color: #fffbeb; border-radius: 8px; padding: 0.85rem; margin-bottom: 0.85rem;">
+          <div style="font-weight: 800; color: #92400e; font-size: 0.9rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+            <span style="background: #d97706; color: #ffffff; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;">1</span>
+            <span>Recommended: Add to iPhone Home Screen (1-Tap Offline App)</span>
+          </div>
+          <ol style="margin-left: 1.5rem; font-size: 0.8rem; color: #78350f; display: flex; flex-direction: column; gap: 0.25rem;">
+            <li>Open the web link in <strong>Safari</strong> on your iPhone.</li>
+            <li>Tap the <strong>Share button</strong> at the bottom (box with an arrow pointing up 📤).</li>
+            <li>Scroll down and tap <strong>"Add to Home Screen"</strong>.</li>
+            <li>Tap <strong>"Add"</strong> in the top right.</li>
+          </ol>
+          <p style="font-size: 0.75rem; color: #92400e; margin-top: 0.4rem; font-weight: 600;">
+            ✨ A "Wire Calc" app icon will be created on your iPhone screen that opens full screen and works offline without internet!
+          </p>
+        </div>
+
+        <!-- Method 2 -->
+        <div style="border: 1.5px solid #cbd5e1; background-color: #f8fafc; border-radius: 8px; padding: 0.85rem;">
+          <div style="font-weight: 800; color: #0f172a; font-size: 0.9rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+            <span style="background: #0f172a; color: #ffffff; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;">2</span>
+            <span>If Opening Downloaded .html File: Use "Documents by Readdle"</span>
+          </div>
+          <p style="font-size: 0.8rem; color: #475569;">
+            Download the free <strong>"Documents by Readdle"</strong> or <strong>"HTML Viewer"</strong> app from the iOS App Store. Share the downloaded <code>wire_gauge_calculator.html</code> to Documents. Tapping it opens it in a full WebKit browser with complete JavaScript support!
+          </p>
+        </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-dark" onclick="closeOutputPreviewModal()">Close Preview</button>
-        <button class="btn btn-amber" onclick="closeOutputPreviewModal(); triggerBrowserPrint();">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          <span>Print Official Job Card</span>
-        </button>
+        <button class="btn btn-dark" onclick="closeIphoneHelpModal()">Got It</button>
       </div>
     </div>
   </div>
@@ -1494,9 +1299,14 @@
 
       gaugesToShow.forEach(wire => {
         const sel = selectedWires.find(item => item.wire.swg === wire.swg);
-        const tile = document.createElement('div');
+        const tile = document.createElement('button');
+        tile.type = 'button';
+        tile.setAttribute('aria-label', `${wire.swg} SWG`);
         tile.className = 'swg-tile' + (sel ? ' selected' : '');
-        tile.onclick = () => toggleWire(wire);
+        tile.onclick = (e) => {
+          e.preventDefault();
+          toggleWire(wire);
+        };
 
         tile.innerHTML = `
           <span class="swg-label">${wire.swg}</span>
@@ -1517,7 +1327,7 @@
       recalculateAll();
     }
 
-    function removeSingleStrand(swg) {
+    function removeSingleWire(swg) {
       const idx = selectedWires.findIndex(item => item.wire.swg === swg);
       if (idx !== -1) {
         if (selectedWires[idx].count > 1) {
@@ -1531,7 +1341,6 @@
 
     function clearAllWires() {
       selectedWires = [];
-      selectedCombination = null;
       recalculateAll();
     }
 
@@ -1554,39 +1363,29 @@
       updateSuggestions();
     }
 
-    function autoCalculateHP(kwVal) {
-      const kw = parseFloat(kwVal);
-      if (!isNaN(kw) && kw > 0) {
-        const rawHp = kw * 1.34102;
-        const roundedHp = Math.ceil(rawHp * 2) / 2; // roundup to nearest 0.5
-        document.getElementById('inp-hp').value = roundedHp.toFixed(1);
-      }
-    }
-
     function recalculateAll() {
       renderSWGGrid();
 
-      // Compute total area & strands
+      // Compute total area & wires
       let totalArea = 0;
-      let totalStrands = 0;
+      let totalWires = 0;
       selectedWires.forEach(item => {
         totalArea += item.wire.area * item.count;
-        totalStrands += item.count;
+        totalWires += item.count;
       });
 
       const breakdownCard = document.getElementById('original-breakdown-card');
       const slidersPanel = document.getElementById('sliders-panel');
       const suggestionsCard = document.getElementById('suggestions-card');
-      const jobCardPanel = document.getElementById('job-card-panel');
 
       if (totalArea > 0) {
         breakdownCard.style.display = 'block';
         slidersPanel.style.display = 'block';
         suggestionsCard.style.display = 'block';
 
-        document.getElementById('orig-strand-count').innerText = totalStrands;
+        document.getElementById('orig-strand-count').innerText = totalWires;
         document.getElementById('orig-total-area-callout').innerText = totalArea.toFixed(4);
-        document.getElementById('orig-footer-strands').innerText = totalStrands;
+        document.getElementById('orig-footer-strands').innerText = totalWires;
         document.getElementById('orig-footer-total-area').innerText = totalArea.toFixed(4) + ' mm²';
 
         // Render rows
@@ -1603,7 +1402,7 @@
               <td style="text-align: right; font-family: monospace; color: #64748b;">${item.wire.inch.toFixed(4)}"</td>
               <td style="text-align: right; font-weight: 800; font-family: monospace; color: #0f172a;">${item.wire.area.toFixed(4)} mm²</td>
               <td style="text-align: center;">
-                <button class="btn btn-outline" style="padding: 0.15rem 0.4rem; font-size: 0.65rem;" onclick="removeSingleStrand('${item.wire.swg}')">✕</button>
+                <button class="btn btn-outline" style="padding: 0.15rem 0.4rem; font-size: 0.65rem;" onclick="removeSingleWire('${item.wire.swg}')">✕</button>
               </td>
             `;
             tbody.appendChild(tr);
@@ -1615,7 +1414,6 @@
         breakdownCard.style.display = 'none';
         slidersPanel.style.display = 'none';
         suggestionsCard.style.display = 'none';
-        jobCardPanel.style.display = 'none';
       }
     }
 
@@ -1633,234 +1431,113 @@
 
       if (currentSuggestions.length === 0) {
         container.innerHTML = `
-          <div style="grid-column: 1 / -1; padding: 2rem; text-align: center; color: #64748b; background-color: #f8fafc; border-radius: 8px;">
-            <p style="font-weight: 700;">No alternate wire combinations within ±${tolerancePct.toFixed(1)}% area tolerance and ${maxVariancePct}% strand variance.</p>
-            <p style="font-size: 0.75rem; margin-top: 0.35rem;">Try increasing the Final Area Tolerance slider above or widening the Strand Variance slider.</p>
+          <div style="padding: 2rem; text-align: center; color: #64748b; background-color: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1;">
+            <p style="font-weight: 700; color: #334155;">No alternate wire combinations within ±${tolerancePct.toFixed(1)}% area tolerance and ${maxVariancePct}% wire variance.</p>
+            <p style="font-size: 0.75rem; margin-top: 0.35rem;">Try increasing the Final Area Tolerance slider above or widening the Wire Variance slider.</p>
           </div>
         `;
         return;
       }
+
+      let html = `
+        <div class="suggestions-table-container">
+          <table class="suggestions-master-table">
+            <thead>
+              <tr>
+                <th>Wire Gauge (SWG)</th>
+                <th style="text-align: right;">Bare Dia (mm)</th>
+                <th style="text-align: right; color: #fde047; font-weight: 900;">Wire Area (mm²)</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
 
       currentSuggestions.forEach((comb, idx) => {
-        const card = document.createElement('div');
-        card.className = 'comb-card' + (comb.isAdjacentReplacement ? ' is-adjacent' : '');
-
-        const wireText = comb.wires.map(w => `${w.swg} SWG`).join(' + ');
         const diffSign = comb.diff >= 0 ? '+' : '';
+        const diffColor = comb.absDiffPct <= 0.8 ? '#15803d' : comb.absDiffPct <= 1.5 ? '#0284c7' : '#d97706';
 
-        card.innerHTML = `
-          <div>
-            ${comb.isAdjacentReplacement ? `
-              <div class="adjacent-pill">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                <span>Adjacent Replacement: ${comb.replacementNote || 'Adjacent wire substitution'}</span>
+        // Group summary for title e.g. "2× 20 SWG + 1× 21 SWG"
+        const countMap = {};
+        comb.wires.forEach(w => {
+          countMap[w.swg] = (countMap[w.swg] || 0) + 1;
+        });
+        const summaryTitle = Object.entries(countMap)
+          .map(([swg, cnt]) => (cnt > 1 ? `${cnt}× ` : '') + `${swg} SWG`)
+          .join(' + ');
+
+        // Combination Header Banner Row
+        html += `
+          <tr class="comb-header-row">
+            <td colspan="3">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                  <span style="background-color: #f59e0b; color: #0f172a; font-weight: 900; font-size: 0.75rem; padding: 0.15rem 0.45rem; border-radius: 4px;">#${idx + 1}</span>
+                  <strong style="color: #ffffff; font-size: 0.85rem; letter-spacing: 0.02em;">Combination #${idx + 1}: ${summaryTitle}</strong>
+                  <span style="color: #cbd5e1; font-size: 0.75rem;">(${comb.wireCount} Parallel Wire${comb.wireCount > 1 ? 's' : ''})</span>
+                  ${comb.isAdjacentReplacement ? `
+                    <span style="background-color: #fef3c7; color: #78350f; font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 4px; display: inline-flex; align-items: center; gap: 0.25rem;">
+                      ★ Adjacent Wires Rule
+                    </span>
+                  ` : ''}
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.75rem;">
+                  <span style="color: #cbd5e1;">Wire-to-Wire Variance: <strong style="color: #ffffff;">${comb.maxVariancePct.toFixed(1)}%</strong></span>
+                  <span style="background-color: ${comb.absDiffPct <= 0.8 ? '#4ade80' : comb.absDiffPct <= 1.5 ? '#38bdf8' : '#fbbf24'}; color: #020617; font-weight: 800; font-size: 0.7rem; padding: 0.15rem 0.55rem; border-radius: 9999px;">
+                    ${diffSign}${comb.diffPct.toFixed(2)}%
+                  </span>
+                </div>
               </div>
-            ` : ''}
-            <div class="comb-gauges">${wireText}</div>
-            <div class="comb-stats">
-              <div>
-                <span class="stat-label">Wire Count:</span>
-                <strong style="color: #0f172a;">${comb.wireCount} strand${comb.wireCount > 1 ? 's' : ''}</strong>
-              </div>
-              <div>
-                <span class="stat-label">Alternate Total Area:</span>
-                <strong style="color: #b45309; font-family: monospace;">${comb.totalArea.toFixed(4)} mm²</strong>
-              </div>
-              <div>
-                <span class="stat-label">Area Difference:</span>
-                <strong style="color: ${comb.diff >= 0 ? '#15803d' : '#0369a1'}; font-family: monospace;">
-                  ${diffSign}${comb.diff.toFixed(4)} mm² (${diffSign}${comb.diffPct.toFixed(2)}%)
-                </strong>
-              </div>
-              <div>
-                <span class="stat-label">Strand Variance:</span>
-                <strong style="color: #0f172a;">${comb.maxVariancePct.toFixed(1)}%</strong>
-              </div>
-            </div>
-          </div>
-          <button class="btn btn-amber" style="width: 100%;" onclick="selectSuggestion(${idx})">
-            Select Alternate & View Job Card
-          </button>
+            </td>
+          </tr>
         `;
-        container.appendChild(card);
+
+        // SWG Wires Listed One Below the Other in Rows
+        comb.wires.forEach((wire) => {
+          html += `
+            <tr class="comb-wire-row">
+              <td>
+                <span style="font-weight: 800; font-size: 0.85rem; color: #0f172a;">${wire.swg}</span>
+                <span style="color: #64748b; font-size: 0.75rem; margin-left: 0.15rem;">SWG</span>
+              </td>
+              <td style="text-align: right; font-family: monospace; font-size: 0.75rem; color: #334155;">
+                ${wire.mm.toFixed(3)} mm <span style="color: #94a3b8; font-size: 0.7rem;">(${wire.inch.toFixed(4)}")</span>
+              </td>
+              <td style="text-align: right; font-family: monospace; font-weight: 800; font-size: 0.85rem; color: #0f172a;">
+                ${wire.area.toFixed(4)} mm²
+              </td>
+            </tr>
+          `;
+        });
+
+        // Finally the TOTAL Row
+        html += `
+          <tr class="comb-total-row">
+            <td style="font-weight: 900; font-size: 0.85rem; color: #451a03;">
+              TOTAL (${comb.wireCount} ${comb.wireCount === 1 ? 'Wire' : 'Wires'})
+            </td>
+            <td style="text-align: right; font-size: 0.75rem; font-weight: 600; color: #475569;">
+              Target: ${origArea.toFixed(4)} mm²
+            </td>
+            <td class="comb-total-area-cell" style="text-align: right;">
+              <div>${comb.totalArea.toFixed(4)} mm²</div>
+              <div style="font-size: 0.7rem; font-weight: 800; color: ${diffColor}; margin-top: 0.15rem;">
+                ${diffSign}${comb.diff.toFixed(4)} mm² (${diffSign}${comb.diffPct.toFixed(2)}%)
+              </div>
+            </td>
+          </tr>
+        `;
       });
-    }
 
-    function selectSuggestion(index) {
-      selectedCombination = currentSuggestions[index];
-      renderJobCardSection();
-
-      // Scroll to job card
-      const el = document.getElementById('job-card-panel');
-      el.style.display = 'block';
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    function renderJobCardSection() {
-      if (!selectedCombination) return;
-
-      const wrap = document.getElementById('side-by-side-wrap');
-      let origArea = 0;
-      const flattenedOrig = [];
-      selectedWires.forEach(item => {
-        for (let c = 0; c < item.count; c++) {
-          flattenedOrig.push(item.wire);
-          origArea += item.wire.area;
-        }
-      });
-
-      wrap.innerHTML = `
-        <div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem;" class="lg-grid-2">
-          <!-- Original Table -->
-          <div style="border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden;">
-            <div style="background-color: #0f172a; color: #ffffff; padding: 0.5rem 0.75rem; font-weight: 800; font-size: 0.8rem; display: flex; justify-content: space-between;">
-              <span>Original Wire Combination (${flattenedOrig.length} strands)</span>
-              <span style="font-family: monospace; color: #fcd34d;">${origArea.toFixed(4)} mm²</span>
-            </div>
-            <table>
-              <thead>
-                <tr>
-                  <th style="width: 40px; text-align: center;">Row</th>
-                  <th>Wire Gauge</th>
-                  <th style="text-align: right;">Bare Dia</th>
-                  <th style="text-align: right;">Area</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${flattenedOrig.map((w, idx) => `
-                  <tr>
-                    <td style="text-align: center; color: #94a3b8; font-family: monospace;">#${idx + 1}</td>
-                    <td style="font-weight: 800;">${w.swg} SWG</td>
-                    <td style="text-align: right; font-family: monospace;">${w.mm.toFixed(3)} mm</td>
-                    <td style="text-align: right; font-family: monospace; font-weight: 700;">${w.area.toFixed(4)} mm²</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Alternate Table -->
-          <div style="border: 1.5px solid #ea580c; border-radius: 6px; overflow: hidden;">
-            <div style="background-color: #c2410c; color: #ffffff; padding: 0.5rem 0.75rem; font-weight: 800; font-size: 0.8rem; display: flex; justify-content: space-between;">
-              <span>Selected Alternate (${selectedCombination.wires.length} strands)</span>
-              <span style="font-family: monospace; color: #fef08a;">${selectedCombination.totalArea.toFixed(4)} mm²</span>
-            </div>
-            <table>
-              <thead>
-                <tr>
-                  <th style="width: 40px; text-align: center;">Row</th>
-                  <th>Wire Gauge</th>
-                  <th style="text-align: right;">Bare Dia</th>
-                  <th style="text-align: right;">Area</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${selectedCombination.wires.map((w, idx) => `
-                  <tr>
-                    <td style="text-align: center; color: #94a3b8; font-family: monospace;">#${idx + 1}</td>
-                    <td style="font-weight: 800; color: #9a3412;">${w.swg} SWG</td>
-                    <td style="text-align: right; font-family: monospace;">${w.mm.toFixed(3)} mm</td>
-                    <td style="text-align: right; font-family: monospace; font-weight: 700; color: #9a3412;">${w.area.toFixed(4)} mm²</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
+      html += `
+            </tbody>
+          </table>
         </div>
       `;
+
+      container.innerHTML = html;
     }
 
-    // 4. PRINTING LOGIC
-    function triggerBrowserPrint() {
-      if (!selectedCombination) {
-        alert('Please select an alternate wire combination before printing the job card.');
-        return;
-      }
-
-      // Populate print document
-      const clientName = (document.getElementById('inp-client').value || 'RALFIN ELECTRICALS, BANGALORE').toUpperCase();
-      const phone = (document.getElementById('inp-phone').value || 'N/A').toUpperCase();
-      const motorDesc = (document.getElementById('inp-motor-desc').value || 'N/A').toUpperCase();
-      const kw = document.getElementById('inp-power-kw').value;
-      const hp = document.getElementById('inp-hp').value;
-      const voltage = (document.getElementById('inp-voltage').value || '415 V').toUpperCase();
-      const rpm = (document.getElementById('inp-rpm').value || '1440 RPM').toUpperCase();
-      const poles = (document.getElementById('inp-poles-phases').value || '4 POLES / 3 PHASE').toUpperCase();
-      const bearings = (document.getElementById('inp-bearings').value || 'N/A').toUpperCase();
-      const mounting = (document.getElementById('inp-mounting').value || 'N/A').toUpperCase();
-      const remarks = (document.getElementById('inp-remarks').value || 'STANDARD COPPER MAGNET WIRE WINDING SPECIFICATION.').toUpperCase();
-
-      document.getElementById('print-date').innerText = 'Date: ' + new Date().toLocaleDateString('en-GB', {
-        day: '2-digit', month: 'short', year: 'numeric'
-      });
-
-      // Motor details grid
-      document.getElementById('print-motor-details').innerHTML = `
-        <div><span style="color: #64748b; font-size: 6.5pt; text-transform: uppercase; font-weight: 800; display: block;">Client Name</span><strong>${clientName}</strong></div>
-        <div><span style="color: #64748b; font-size: 6.5pt; text-transform: uppercase; font-weight: 800; display: block;">Contact Phone</span><span>${phone}</span></div>
-        <div><span style="color: #64748b; font-size: 6.5pt; text-transform: uppercase; font-weight: 800; display: block;">Motor Description</span><strong>${motorDesc}</strong></div>
-        <div><span style="color: #64748b; font-size: 6.5pt; text-transform: uppercase; font-weight: 800; display: block;">Power (KW / HP)</span><strong>${kw ? kw + ' KW' : ''} ${hp ? '(' + hp + ' HP)' : ''}</strong></div>
-        <div><span style="color: #64748b; font-size: 6.5pt; text-transform: uppercase; font-weight: 800; display: block;">Voltage</span><span>${voltage}</span></div>
-        <div><span style="color: #64748b; font-size: 6.5pt; text-transform: uppercase; font-weight: 800; display: block;">Speed</span><span>${rpm}</span></div>
-        <div><span style="color: #64748b; font-size: 6.5pt; text-transform: uppercase; font-weight: 800; display: block;">Poles / Phases</span><span>${poles}</span></div>
-        <div><span style="color: #64748b; font-size: 6.5pt; text-transform: uppercase; font-weight: 800; display: block;">Bearings</span><span>${bearings}</span></div>
-        <div><span style="color: #64748b; font-size: 6.5pt; text-transform: uppercase; font-weight: 800; display: block;">Mounting</span><span>${mounting}</span></div>
-        <div style="grid-column: span 3;"><span style="color: #64748b; font-size: 6.5pt; text-transform: uppercase; font-weight: 800; display: block;">Remarks</span><span>${remarks}</span></div>
-      `;
-
-      // Area comparison
-      let origArea = 0;
-      const flattenedOrig = [];
-      selectedWires.forEach(item => {
-        for (let c = 0; c < item.count; c++) {
-          flattenedOrig.push(item.wire);
-          origArea += item.wire.area;
-        }
-      });
-
-      const diffSign = selectedCombination.diff >= 0 ? '+' : '';
-      document.getElementById('print-area-comparison-body').innerHTML = `
-        <tr>
-          <td style="padding: 4px 6px; font-weight: 800;">Calculated Values</td>
-          <td style="padding: 4px 6px; font-family: monospace; font-weight: 800;">${origArea.toFixed(4)} mm²</td>
-          <td style="padding: 4px 6px; font-family: monospace; font-weight: 800; color: #9a3412;">${selectedCombination.totalArea.toFixed(4)} mm²</td>
-          <td style="padding: 4px 6px; font-family: monospace; font-weight: 800;">${diffSign}${selectedCombination.diff.toFixed(4)} mm² (${diffSign}${selectedCombination.diffPct.toFixed(2)}%)</td>
-          <td style="padding: 4px 6px; font-family: monospace; font-weight: 800;">${selectedCombination.maxVariancePct.toFixed(1)}%</td>
-          <td style="padding: 4px 6px; font-family: monospace;">${selectedCombination.closestWireDiff ? selectedCombination.closestWireDiff.swg + ' SWG' : 'Negligible'}</td>
-        </tr>
-      `;
-
-      // Original wires table
-      document.getElementById('print-orig-total-hdr').innerText = origArea.toFixed(4) + ' mm²';
-      document.getElementById('print-orig-strands-foot').innerText = flattenedOrig.length + ' strands';
-      document.getElementById('print-orig-area-foot').innerText = origArea.toFixed(4) + ' mm²';
-      document.getElementById('print-orig-wires-body').innerHTML = flattenedOrig.map((w, i) => `
-        <tr>
-          <td style="padding: 3px 4px; text-align: center; color: #64748b;">#${i + 1}</td>
-          <td style="padding: 3px 4px; font-weight: 800;">${w.swg} SWG</td>
-          <td style="padding: 3px 4px; text-align: right; font-family: monospace;">${w.mm.toFixed(3)} mm</td>
-          <td style="padding: 3px 4px; text-align: right; font-family: monospace; font-weight: 700;">${w.area.toFixed(4)} mm²</td>
-        </tr>
-      `).join('');
-
-      // Alternate wires table
-      document.getElementById('print-alt-total-hdr').innerText = selectedCombination.totalArea.toFixed(4) + ' mm²';
-      document.getElementById('print-alt-strands-foot').innerText = selectedCombination.wires.length + ' strands';
-      document.getElementById('print-alt-area-foot').innerText = selectedCombination.totalArea.toFixed(4) + ' mm²';
-      document.getElementById('print-alt-wires-body').innerHTML = selectedCombination.wires.map((w, i) => `
-        <tr>
-          <td style="padding: 3px 4px; text-align: center; color: #64748b;">#${i + 1}</td>
-          <td style="padding: 3px 4px; font-weight: 800; color: #9a3412;">${w.swg} SWG</td>
-          <td style="padding: 3px 4px; text-align: right; font-family: monospace;">${w.mm.toFixed(3)} mm</td>
-          <td style="padding: 3px 4px; text-align: right; font-family: monospace; font-weight: 700;">${w.area.toFixed(4)} mm²</td>
-        </tr>
-      `).join('');
-
-      // Invoke browser print dialog
-      window.print();
-    }
-
-    // 5. MODAL HANDLERS
+    // Modal handlers
     function openSWGTableModal() {
       const tbody = document.getElementById('modal-swg-table-body');
       tbody.innerHTML = SWG_DATABASE.map(w => `
@@ -1877,115 +1554,12 @@
       document.getElementById('modal-swg-table').classList.remove('open');
     }
 
-    function openOutputPreviewModal() {
-      if (!selectedCombination) {
-        alert('Please select an alternate wire combination first.');
-        return;
-      }
-
-      let origArea = 0;
-      const flattenedOrig = [];
-      selectedWires.forEach(item => {
-        for (let c = 0; c < item.count; c++) {
-          flattenedOrig.push(item.wire);
-          origArea += item.wire.area;
-        }
-      });
-
-      const clientName = (document.getElementById('inp-client').value || 'RALFIN ELECTRICALS, BANGALORE').toUpperCase();
-      const phone = (document.getElementById('inp-phone').value || 'N/A').toUpperCase();
-      const motorDesc = (document.getElementById('inp-motor-desc').value || 'N/A').toUpperCase();
-      const kw = document.getElementById('inp-power-kw').value;
-      const hp = document.getElementById('inp-hp').value;
-      const diffSign = selectedCombination.diff >= 0 ? '+' : '';
-
-      document.getElementById('preview-modal-body').innerHTML = `
-        <div style="background-color: #0f172a; color: #ffffff; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <h4 style="font-size: 1.1rem; font-weight: 900; text-transform: uppercase;">RALFIN ELECTRICALS, BANGALORE</h4>
-            <p style="font-size: 0.75rem; color: #fcd34d; font-weight: 700;">Motor Winding Division • Output Form Preview</p>
-          </div>
-          <span style="font-size: 0.75rem; color: #cbd5e1;">Date: ${new Date().toLocaleDateString('en-GB')}</span>
-        </div>
-
-        <!-- Section 1 -->
-        <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 0.75rem; margin-bottom: 1rem;">
-          <h5 style="font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: #334155; margin-bottom: 0.5rem;">
-            1. Motor & Client Details
-          </h5>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; font-size: 0.75rem;">
-            <div><span style="color: #64748b; font-size: 0.7rem; display: block;">Client</span><strong>${clientName}</strong></div>
-            <div><span style="color: #64748b; font-size: 0.7rem; display: block;">Phone</span><span>${phone}</span></div>
-            <div><span style="color: #64748b; font-size: 0.7rem; display: block;">Motor Description</span><span>${motorDesc}</span></div>
-            <div><span style="color: #64748b; font-size: 0.7rem; display: block;">Power</span><strong>${kw ? kw + ' KW' : ''} ${hp ? '(' + hp + ' HP)' : ''}</strong></div>
-          </div>
-        </div>
-
-        <!-- Section 2 -->
-        <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 0.75rem; margin-bottom: 1rem;">
-          <h5 style="font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: #334155; margin-bottom: 0.5rem;">
-            2. Cross-Sectional Area Comparison
-          </h5>
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; font-size: 0.75rem;">
-            <div><span style="color: #64748b; font-size: 0.7rem; display: block;">Original Total Area</span><strong style="font-family: monospace;">${origArea.toFixed(4)} mm²</strong></div>
-            <div><span style="color: #64748b; font-size: 0.7rem; display: block;">Alternate Total Area</span><strong style="color: #9a3412; font-family: monospace;">${selectedCombination.totalArea.toFixed(4)} mm²</strong></div>
-            <div><span style="color: #64748b; font-size: 0.7rem; display: block;">Area Difference</span><strong style="font-family: monospace;">${diffSign}${selectedCombination.diff.toFixed(4)} mm² (${diffSign}${selectedCombination.diffPct.toFixed(2)}%)</strong></div>
-            <div><span style="color: #64748b; font-size: 0.7rem; display: block;">Strand Variance</span><strong>${selectedCombination.maxVariancePct.toFixed(1)}%</strong></div>
-          </div>
-        </div>
-
-        <!-- Section 3: Signatures -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
-          <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 0.5rem;">
-            <span style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">Winding Supervisor Signature & Name:</span>
-            <div style="height: 32px; border-bottom: 1px dashed #cbd5e1; display: flex; align-items: flex-end;">
-              <span style="font-size: 0.7rem; color: #94a3b8; font-style: italic;">Signature / Name</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: #64748b; margin-top: 3px;">
-              <span>Date: _______________</span>
-              <span style="font-weight: 700;">Ralfin Electricals</span>
-            </div>
-          </div>
-
-          <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 0.5rem;">
-            <span style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">Quality Inspector / Tested By:</span>
-            <div style="height: 32px; border-bottom: 1px dashed #cbd5e1; display: flex; align-items: flex-end;">
-              <span style="font-size: 0.7rem; color: #94a3b8; font-style: italic;">Signature / Name</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: #64748b; margin-top: 3px;">
-              <span>Date: _______________</span>
-              <span style="font-weight: 700;">QA Division</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2-Line Feedback Notice in Modal -->
-        <div style="background-color: #0f172a; padding: 0.75rem; border-radius: 6px; text-align: center; color: #ffffff;">
-          <p style="font-weight: 800; color: #fcd34d; font-size: 0.8rem;">
-            Please send your feedback regarding improvements and additional features you need,
-          </p>
-          <p style="font-weight: 600; color: #f1f5f9; font-size: 0.75rem; margin-top: 2px;">
-            to developer Lukhman at +91-7019192462 (Message on whatsapp only)
-          </p>
-        </div>
-      `;
-      document.getElementById('modal-preview').classList.add('open');
+    function openIphoneHelpModal() {
+      document.getElementById('modal-iphone-help').classList.add('open');
     }
-    function closeOutputPreviewModal() {
-      document.getElementById('modal-preview').classList.remove('open');
+    function closeIphoneHelpModal() {
+      document.getElementById('modal-iphone-help').classList.remove('open');
     }
-
-    // Auto-capitalize inputs
-    document.addEventListener('input', function(e) {
-      if (e.target && e.target.classList.contains('uppercase-input')) {
-        const start = e.target.selectionStart;
-        const end = e.target.selectionEnd;
-        e.target.value = e.target.value.toUpperCase();
-        if (start !== null && end !== null) {
-          e.target.setSelectionRange(start, end);
-        }
-      }
-    });
 
     // Initialize on page load
     window.addEventListener('DOMContentLoaded', () => {

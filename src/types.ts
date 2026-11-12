@@ -39,21 +39,3 @@ export interface SuggestedCombination {
   replacementNote?: string;
 }
 
-export interface MotorJobCard {
-  clientName: string;
-  contactPhone: string;
-  motorDesc: string;
-  serialNo: string;
-  motorType: string;
-  powerKw: string;
-  hp: string;
-  voltage: string;
-  frequency: string;
-  poles: string;
-  phases: string;
-  rpm: string;
-  mounting: string;
-  bearings: string;
-  remarks: string;
-}
-

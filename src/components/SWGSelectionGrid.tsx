@@ -71,7 +71,7 @@ export const SWGSelectionGrid: React.FC<SWGSelectionGridProps> = ({
           {totalWiresCount > 0 && (
             <>
               <span className="px-2.5 py-1 text-xs font-bold bg-amber-100 text-amber-900 rounded-full border border-amber-300">
-                {totalWiresCount} {t('strands')}
+                {totalWiresCount} {totalWiresCount === 1 ? 'Wire' : 'Wires'}
               </span>
               <button
                 onClick={onClearAll}
